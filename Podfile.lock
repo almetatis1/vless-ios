@@ -1,0 +1,27 @@
+PODS:
+  - AppsFlyerFramework (6.17.8):
+    - AppsFlyerFramework/Main (= 6.17.8)
+  - AppsFlyerFramework/Main (6.17.8)
+  - RevenueCat (5.55.3)
+  - RevenueCatUI (5.55.3):
+    - RevenueCat (= 5.55.3)
+
+DEPENDENCIES:
+  - AppsFlyerFramework (~> 6.14)
+  - RevenueCat (~> 5.0)
+  - RevenueCatUI (~> 5.0)
+
+SPEC REPOS:
+  trunk:
+    - AppsFlyerFramework
+    - RevenueCat
+    - RevenueCatUI
+
+SPEC CHECKSUMS:
+  AppsFlyerFramework: 63577b60d6b9fcdab60135289979e7d1c9ec79b9
+  RevenueCat: 5047075d769f19cccb0c8215633563017cb9c601
+  RevenueCatUI: b35c7c05b7e34c39988fe61e9e833e7eca078f5f
+
+PODFILE CHECKSUM: 4d6068dd5885ae814752db21001e2bba6a615fe3
+
+COCOAPODS: 1.16.2
