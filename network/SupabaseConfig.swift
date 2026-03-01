@@ -24,6 +24,7 @@ struct SupabaseConfig {
         request.setValue(supabaseAnonKey, forHTTPHeaderField: "apikey")
         request.setValue("Bearer \(supabaseAnonKey)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
         
         URLSession.shared.dataTask(with: request) { data, response, error in
             if let error = error {

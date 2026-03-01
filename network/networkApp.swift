@@ -10,16 +10,84 @@ import Network
 import NetworkExtension
 
 
+// MARK: - Language Manager
+final class LanguageManager: ObservableObject {
+    static let shared = LanguageManager()
+
+    static let supportedLanguages: [(code: String, name: String, nativeName: String)] = [
+        ("en",      "English",            "English"),
+        ("ar",      "Arabic",             "العربية"),
+        ("de",      "German",             "Deutsch"),
+        ("es",      "Spanish",            "Español"),
+        ("fr",      "French",             "Français"),
+        ("he",      "Hebrew",             "עברית"),
+        ("hi",      "Hindi",              "हिन्दी"),
+        ("id",      "Indonesian",         "Indonesia"),
+        ("pt-BR",   "Portuguese (Brazil)","Português (BR)"),
+        ("ru",      "Russian",            "Русский"),
+        ("tr",      "Turkish",            "Türkçe"),
+        ("zh-Hans", "Chinese Simplified", "简体中文"),
+    ]
+
+    @Published private(set) var bundle: Bundle = .main
+
+    /// Device preferred language code if it's in our supported list; otherwise nil.
+    private static func deviceLanguageCode() -> String? {
+        let preferred = Bundle.main.preferredLocalizations.first ?? Locale.current.language.languageCode?.identifier ?? "en"
+        let supported = Set(supportedLanguages.map(\.code))
+        if supported.contains(preferred) { return preferred }
+        let langPart = preferred.components(separatedBy: "-").first ?? preferred
+        if supported.contains(langPart) { return langPart }
+        if langPart == "pt" { return "pt-BR" }
+        return nil
+    }
+
+    /// Current app language: explicit user choice if set, otherwise device language (if supported), else "en".
+    var currentLanguageCode: String {
+        get {
+            if let saved = UserDefaults.standard.string(forKey: "appLanguage"), !saved.isEmpty {
+                return saved
+            }
+            return Self.deviceLanguageCode() ?? "en"
+        }
+        set {
+            UserDefaults.standard.set(newValue, forKey: "appLanguage")
+            updateBundle(for: newValue)
+        }
+    }
+
+    private init() {
+        let code = UserDefaults.standard.string(forKey: "appLanguage").flatMap { $0.isEmpty ? nil : $0 }
+            ?? Self.deviceLanguageCode()
+            ?? "en"
+        updateBundle(for: code)
+    }
+
+    private func updateBundle(for code: String) {
+        // Find the .lproj folder for this language code
+        if let path = Bundle.main.path(forResource: code, ofType: "lproj"),
+           let b = Bundle(path: path) {
+            bundle = b
+        } else {
+            bundle = .main
+        }
+        objectWillChange.send()
+    }
+}
+
 @main
 struct NetworkApp: App {
     @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
+    @StateObject private var languageManager = LanguageManager.shared
 
     var body: some Scene {
         WindowGroup {
             if hasSeenOnboarding {
                 NetworkView()
+                    .environmentObject(languageManager)
             } else {
                 OnboardingView(hasSeenOnboarding: $hasSeenOnboarding)
+                    .environmentObject(languageManager)
             }
         }
     }
@@ -58,22 +126,25 @@ struct FoxMascotView: View {
 }
 
 struct NetworkView: View {
+    @EnvironmentObject private var languageManager: LanguageManager
+
     @State private var isLoading = false
     @State private var statusMessage = ""
     @State private var isConnected = false
     @State private var showingCredentialAlert = false
 
     @State private var showingSettings = false
-    @State private var showingServerSelector = false
-    
+
     // Supabase VPN servers
     @State private var vpnServers: [VPNServer] = []
     @State private var selectedServer: VPNServer? = nil
     @State private var isLoadingServers = false
-    
+    @State private var serverLatencies: [String: Double] = [:]
+
     // Tab navigation
     @State private var selectedTab: AppTab = .vpn
     @State private var showingVPNSheet = false
+    @State private var showingTracerouteScreen = false
     @State private var tracerouteDestination: String = ""
 
     // RevenueCat
@@ -82,6 +153,9 @@ struct NetworkView: View {
 
     // Appearance
     @AppStorage("appTheme") private var appTheme: String = "dark"
+
+    // Language picker
+    @State private var showingLanguagePicker = false
 
     // Network Security Services
     @StateObject private var pingService = PingService()
@@ -116,32 +190,20 @@ struct NetworkView: View {
     
     public var body: some View {
         TabView(selection: $selectedTab) {
-            Tab("VPN", systemImage: "globe", value: .vpn) {
+            Tab(L10n.vpnTabTitle, systemImage: "shield.fill", value: .vpn) {
                 vpnTabContent
             }
 
-            Tab("Speed", systemImage: "speedometer", value: .scanner) {
-                speedTestTabContent
+            Tab(L10n.serversTabTitle, systemImage: "server.rack", value: .servers) {
+                serversTabContent
             }
 
-            Tab("Tools", systemImage: "point.topleft.down.to.point.bottomright.curvepath.fill", value: .tools) {
-                toolsTabContent
-            }
-
-            Tab("Settings", systemImage: "gearshape.fill", value: .settings) {
+            Tab(L10n.profileTitle, systemImage: "person.fill", value: .profile) {
                 settingsTabContent2
             }
         }
         .preferredColorScheme(appTheme == "light" ? .light : .dark)
         .tabViewStyle(.sidebarAdaptable)
-        .sheet(isPresented: $showingServerSelector) {
-            SupabaseServerSelectorView(
-                selectedServer: $selectedServer,
-                vpnServers: vpnServers,
-                isLoadingServers: isLoadingServers,
-                onRefresh: fetchVPNServers
-            )
-        }
         .sheet(isPresented: $showingPaywall) {
             PaywallView {
                 setupAndConnectVPN()
@@ -149,6 +211,20 @@ struct NetworkView: View {
         }
         .fullScreenCover(isPresented: $showingVPNSheet) {
             vpnScreenContent
+        }
+        .fullScreenCover(isPresented: $showingTracerouteScreen) {
+            NavigationStack {
+                tracerouteBody
+                    .navigationTitle(L10n.smartRouteTitle)
+                    .navigationBarTitleDisplayMode(.large)
+                    .toolbar {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button(L10n.done) {
+                                showingTracerouteScreen = false
+                            }
+                        }
+                    }
+            }
         }
         .onAppear {
             revenueCatManager.configure()
@@ -172,7 +248,7 @@ struct NetworkView: View {
                                 Image(systemName: "arrow.down.circle.fill")
                                     .foregroundColor(.cyan)
                                     .font(.caption)
-                                Text("Download Mbps")
+                                Text(L10n.downloadMbps)
                                     .font(.caption)
                                     .fontWeight(.semibold)
                                     .foregroundColor(.primary)
@@ -192,7 +268,7 @@ struct NetworkView: View {
                                 Image(systemName: "arrow.up.circle.fill")
                                     .foregroundColor(.cyan)
                                     .font(.caption)
-                                Text("Upload Mbps")
+                                Text(L10n.uploadMbps)
                                     .font(.caption)
                                     .fontWeight(.semibold)
                                     .foregroundColor(.primary)
@@ -211,10 +287,10 @@ struct NetworkView: View {
                     // Ping & Jitter row
                     HStack(spacing: 24) {
                         HStack(spacing: 6) {
-                            Text("Ping")
+                            Text(L10n.ping)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                            Text("ms")
+                            Text(L10n.ms)
                                 .font(.caption2)
                                 .foregroundColor(.secondary)
                             Text(speedTestService.currentResult != nil
@@ -226,10 +302,10 @@ struct NetworkView: View {
                         }
 
                         HStack(spacing: 6) {
-                            Text("Jitter")
+                            Text(L10n.jitter)
                                 .font(.caption)
                                 .foregroundColor(.secondary)
-                            Text("ms")
+                            Text(L10n.ms)
                                 .font(.caption2)
                                 .foregroundColor(.secondary)
                             Text(speedTestService.currentResult != nil
@@ -272,7 +348,7 @@ struct NetworkView: View {
                     .padding(.horizontal, 40)
 
                     if isConnected && !speedTestService.isRunning {
-                        Text("VPN is active · results reflect protected speed")
+                        Text(L10n.vpnActiveSpeedNote)
                             .font(.caption)
                             .foregroundColor(.secondary)
                             .padding(.bottom, 12)
@@ -282,7 +358,7 @@ struct NetworkView: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(Color(.systemBackground))
-            .navigationTitle("Speed")
+            .navigationTitle(L10n.speedTabTitle)
             .navigationBarTitleDisplayMode(.large)
         }
     }
@@ -306,11 +382,11 @@ struct NetworkView: View {
                             .foregroundColor(isConnected ? .green : .gray)
                     }
 
-                    Text(isConnected ? "Protected" : "Not Protected")
+                    Text(isConnected ? L10n.protected : L10n.notProtected)
                         .font(.title)
                         .fontWeight(.bold)
 
-                    Text("Encrypt")
+                    Text(L10n.encrypt)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .multilineTextAlignment(.center)
@@ -336,7 +412,7 @@ struct NetworkView: View {
                             } else {
                                 Image(systemName: isConnected ? "power" : "bolt.shield.fill")
                             }
-                            Text(isLoading ? "Connecting..." : (isConnected ? "Disconnect" : "Connect"))
+                            Text(isLoading ? L10n.connecting : (isConnected ? L10n.disconnect : L10n.connect))
                                 .font(.headline)
                         }
                         .frame(maxWidth: .infinity)
@@ -361,7 +437,7 @@ struct NetworkView: View {
                     Button(action: { showingVPNSheet = false }) {
                         HStack(spacing: 4) {
                             Image(systemName: "chevron.left")
-                            Text("Back")
+                            Text(L10n.back)
                         }
                     }
                 }
@@ -462,121 +538,298 @@ struct NetworkView: View {
         }
     }
     
-    // VPN Tab — redesigned with fox mascot, status, connect button, server chip
+    // VPN Tab — Foxy Wall main screen
     private var vpnTabContent: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                Spacer()
-
-                // Fox mascot
-                FoxMascotView(state: isLoading ? .connecting : (isConnected ? .connected : .idle))
-                    .padding(.bottom, 8)
-
-                // Status headline + subtitle
-                VStack(spacing: 6) {
-                    Text(isLoading ? "Connecting..." : (isConnected ? "Protected" : "Not Protected"))
-                        .font(.title2)
-                        .fontWeight(.bold)
-                        .foregroundColor(isConnected ? .green : .primary)
-                        .animation(.easeInOut(duration: 0.3), value: isConnected)
-
-                    if let server = selectedServer, isConnected {
-                        Text("Fox is guarding from \(server.city)")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    } else if !isConnected && !isLoading {
-                        Text("Your connection is not secure")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                    }
-                }
-                .padding(.bottom, 8)
-
-                Spacer()
-
-                VStack(spacing: 14) {
-                    // Connect / Disconnect button
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 16) {
+                    // Big glowing connect button
                     Button(action: {
                         if isConnected { disconnectVPN() } else { setupAndConnectVPN() }
                     }) {
-                        HStack(spacing: 10) {
-                            if isLoading {
-                                ProgressView().tint(.white)
-                            } else {
-                                Image(systemName: isConnected ? "power" : "bolt.shield.fill")
-                            }
-                            Text(isLoading ? "Connecting..." : (isConnected ? "Disconnect" : "Connect"))
-                                .font(.headline)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 16)
-                        .background(
-                            LinearGradient(
-                                colors: isConnected
-                                    ? [.red, .red.opacity(0.85)]
-                                    : [Color(red: 0.91, green: 0.46, blue: 0.17), Color(red: 0.77, green: 0.36, blue: 0.07)],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        .foregroundColor(.white)
-                        .cornerRadius(14)
-                    }
-                    .disabled(isLoading)
-                    .accessibilityLabel(isConnected ? "Disconnect VPN" : "Connect to VPN")
-                    .accessibilityHint("Double tap to \(isConnected ? "disconnect" : "connect")")
+                        ZStack {
+                            // Outermost glow ring
+                            Circle()
+                                .fill(
+                                    RadialGradient(
+                                        colors: isConnected
+                                            ? [Color.green.opacity(0.15), Color.green.opacity(0.0)]
+                                            : [Color.gray.opacity(0.10), Color.gray.opacity(0.0)],
+                                        center: .center,
+                                        startRadius: 80,
+                                        endRadius: 150
+                                    )
+                                )
+                                .frame(width: 300, height: 300)
 
-                    // Server chip
-                    Button(action: { showingServerSelector = true }) {
-                        HStack(spacing: 10) {
-                            if let server = selectedServer {
-                                Text(server.flag)
-                                    .font(.title3)
-                                Text("\(server.name) - \(server.city)")
-                                    .font(.subheadline)
-                                    .fontWeight(.medium)
-                                    .foregroundColor(.primary)
-                                    .lineLimit(1)
+                            // Middle ring
+                            Circle()
+                                .fill(
+                                    isConnected
+                                        ? Color.green.opacity(0.18)
+                                        : Color.gray.opacity(0.12)
+                                )
+                                .frame(width: 220, height: 220)
+
+                            // Stroke ring
+                            Circle()
+                                .stroke(
+                                    isConnected ? Color.green : Color.gray.opacity(0.4),
+                                    lineWidth: 3
+                                )
+                                .frame(width: 200, height: 200)
+
+                            // Inner filled circle
+                            Circle()
+                                .fill(
+                                    isConnected
+                                        ? Color.green.opacity(0.35)
+                                        : Color.gray.opacity(0.15)
+                                )
+                                .frame(width: 145, height: 145)
+
+                            // Shield / loading icon
+                            if isLoading {
+                                ProgressView()
+                                    .scaleEffect(1.5)
+                                    .tint(isConnected ? .green : .gray)
                             } else {
-                                Image(systemName: "globe")
-                                    .foregroundColor(.secondary)
-                                Text("Select Server")
-                                    .font(.subheadline)
-                                    .foregroundColor(.secondary)
+                                Image(systemName: isConnected ? "checkmark.shield.fill" : "shield.fill")
+                                    .font(.system(size: 52))
+                                    .foregroundColor(isConnected ? .white : Color.gray.opacity(0.5))
                             }
-                            Spacer()
-                            Image(systemName: "chevron.right")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 12)
-                        .background(Color(.secondarySystemBackground))
-                        .cornerRadius(14)
                     }
                     .buttonStyle(.plain)
-                    .accessibilityLabel("Select VPN server")
+                    .disabled(isLoading)
+                    .padding(.top, 8)
+
+                    // Status text (removed per design)
+
+                    // Server card
+                    Button(action: { selectedTab = .servers }) {
+                        HStack(spacing: 14) {
+                            if let server = selectedServer {
+                                Text(server.flag)
+                                    .font(.system(size: 32))
+
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(server.localizedCityName(preferredLocale: languageManager.currentLanguageCode))
+                                        .font(.headline)
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(.primary)
+                                        .lineLimit(1)
+                                }
+                            } else {
+                                Image(systemName: "globe")
+                                    .font(.system(size: 28))
+                                    .foregroundColor(.secondary)
+                                Text(L10n.selectServer)
+                                    .font(.headline)
+                                    .foregroundColor(.secondary)
+                            }
+
+                            Spacer()
+
+                            // Ping indicator
+                            if isConnected {
+                                HStack(spacing: 4) {
+                                    Circle()
+                                        .fill(Color.green)
+                                        .frame(width: 7, height: 7)
+                                    Text("20 ms")
+                                        .font(.subheadline)
+                                        .foregroundColor(.primary)
+                                }
+                            }
+
+                            // Arrow button
+                            Button(action: { selectedTab = .servers }) {
+                                Image(systemName: "arrow.up.right")
+                                    .font(.system(size: 16, weight: .semibold))
+                                    .foregroundColor(.white)
+                                    .frame(width: 36, height: 36)
+                                    .background(Color(red: 0.2, green: 0.6, blue: 0.9))
+                                    .clipShape(Circle())
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        .padding(.horizontal, 18)
+                        .padding(.vertical, 16)
+                        .background(Color(.secondarySystemBackground))
+                        .cornerRadius(16)
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.horizontal, 16)
+
+                    // Map + Smart Route row
+                    HStack(spacing: 12) {
+                        // Map card (tapping opens traceroute / Smart Route)
+                        Button(action: { showingTracerouteScreen = true }) {
+                            ZStack(alignment: .bottomLeading) {
+                                TracerouteMapView(hops: tracerouteService.hops)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 130)
+                                    .clipShape(RoundedRectangle(cornerRadius: 16))
+
+                                // Expand icon
+                                Image(systemName: "arrow.up.left.and.arrow.down.right")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.white)
+                                    .padding(6)
+                                    .background(Color.black.opacity(0.4))
+                                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                                    .padding(8)
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+
+                                // Location badge
+                                if let server = selectedServer {
+                                    HStack(spacing: 4) {
+                                        Circle()
+                                            .fill(Color.green)
+                                            .frame(width: 7, height: 7)
+                                        Text("\(server.localizedCityName(preferredLocale: languageManager.currentLanguageCode))")
+                                            .font(.caption2)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(.white)
+                                    }
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(Color.black.opacity(0.5))
+                                    .cornerRadius(10)
+                                    .padding(8)
+                                }
+                            }
+                        }
+                        .buttonStyle(.plain)
+                        .frame(maxWidth: .infinity)
+
+                        // Speed Test box (replaces Smart Route)
+                        Button(action: {
+                            if !speedTestService.isRunning {
+                                speedTestService.runSpeedTest()
+                            }
+                        }) {
+                            VStack(spacing: 8) {
+                                Image(systemName: "speedometer")
+                                    .font(.system(size: 28))
+                                    .foregroundColor(speedTestService.currentResult != nil ? .cyan : Color.gray.opacity(0.5))
+
+                                Text(L10n.speedTestTitle)
+                                    .font(.subheadline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.primary)
+
+                                if speedTestService.isRunning {
+                                    Text(speedTestService.currentPhase.description)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                        .lineLimit(1)
+                                } else if let result = speedTestService.currentResult {
+                                    Text(String(format: "↓%.1f ↑%.1f", result.downloadSpeedMbps, result.uploadSpeedMbps))
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                } else {
+                                    Text(L10n.speedTapToMeasure)
+                                        .font(.caption)
+                                        .foregroundColor(.secondary)
+                                }
+                            }
+                            .frame(maxWidth: .infinity, minHeight: 130)
+                            .background(Color(.secondarySystemBackground))
+                            .cornerRadius(16)
+                        }
+                        .buttonStyle(.plain)
+                        .disabled(speedTestService.isRunning)
+                        .frame(maxWidth: .infinity)
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 16)
                 }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 32)
+                .padding(.top, 8)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color(.systemBackground))
-            .navigationTitle("VPN")
+            .background(
+                isConnected ? Color.green.opacity(0.04) : Color(.systemBackground)
+            )
+            .navigationTitle(L10n.vpnTabTitle)
             .navigationBarTitleDisplayMode(.large)
         }
     }
 
-    // MARK: - Tools Tab (Traceroute)
-    private var toolsTabContent: some View {
+    // MARK: - Servers Tab
+    private var serversTabContent: some View {
         NavigationStack {
+            Group {
+                if isLoadingServers {
+                    ProgressView(L10n.loadingServers)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else if vpnServers.isEmpty {
+                    VStack(spacing: 12) {
+                        Text(L10n.noServersAvailable)
+                            .font(.headline)
+                        Button(L10n.refresh) {
+                            fetchVPNServers()
+                        }
+                        .buttonStyle(.bordered)
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    ScrollView {
+                        LazyVStack(spacing: 12) {
+                            ForEach(vpnServers) { server in
+                                SupabaseServerRow(
+                                    server: server,
+                                    isSelected: selectedServer?.id == server.id,
+                                    pingMs: serverLatencies[server.id]
+                                ) {
+                                    selectedServer = server
+                                }
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+                    .refreshable {
+                        fetchVPNServers()
+                    }
+                    .onAppear {
+                        startServerPings()
+                    }
+                }
+            }
+            .background(Color(.systemBackground))
+            .navigationTitle(L10n.serversTabTitle)
+            .navigationBarTitleDisplayMode(.large)
+        }
+    }
+
+    // MARK: - Traceroute body (Smart Route – shown when map is tapped)
+    private var tracerouteBody: some View {
+        VStack(spacing: 0) {
+            // Full-width map at top
+            ZStack(alignment: .bottomLeading) {
+                TracerouteMapView(hops: tracerouteService.hops)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 260)
+
+                // Location badge overlay
+                if let server = selectedServer, tracerouteService.hops.isEmpty {
+                    HStack(spacing: 4) {
+                        Circle().fill(Color.green).frame(width: 7, height: 7)
+                        Text("\(server.localizedCityName(preferredLocale: languageManager.currentLanguageCode))")
+                            .font(.caption2).fontWeight(.semibold).foregroundColor(.white)
+                    }
+                    .padding(.horizontal, 8).padding(.vertical, 4)
+                    .background(Color.black.opacity(0.5)).cornerRadius(10)
+                    .padding(12)
+                }
+            }
+
+            // Search + controls
             ScrollView(showsIndicators: false) {
-                VStack(spacing: 16) {
+                VStack(spacing: 14) {
                     // Search bar
                     HStack(spacing: 10) {
-                        Image(systemName: "magnifyingglass")
-                            .foregroundColor(.secondary)
-
+                        Image(systemName: "magnifyingglass").foregroundColor(.secondary)
                         TextField("Enter IP or domain", text: $tracerouteDestination)
                             .autocapitalization(.none)
                             .keyboardType(.URL)
@@ -586,7 +839,6 @@ struct NetworkView: View {
                                     tracerouteService.traceroute(to: tracerouteDestination)
                                 }
                             }
-
                         if tracerouteService.isRunning {
                             ProgressView()
                         } else if !tracerouteDestination.isEmpty {
@@ -595,14 +847,14 @@ struct NetworkView: View {
                             }) {
                                 Image(systemName: "arrow.right.circle.fill")
                                     .font(.title2)
-                                    .foregroundColor(Color(red: 0.91, green: 0.46, blue: 0.17))
+                                    .foregroundColor(Color(red: 0.2, green: 0.6, blue: 0.9))
                             }
                         }
                     }
                     .padding(12)
                     .background(Color(.systemGray6))
                     .cornerRadius(12)
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, 16)
 
                     // Trace to current VPN server shortcut
                     if let server = selectedServer {
@@ -615,127 +867,72 @@ struct NetworkView: View {
                         }) {
                             HStack(spacing: 10) {
                                 Image(systemName: "point.topleft.down.to.point.bottomright.curvepath.fill")
-                                    .foregroundColor(Color(red: 0.91, green: 0.46, blue: 0.17))
+                                    .foregroundColor(Color(red: 0.2, green: 0.6, blue: 0.9))
                                 VStack(alignment: .leading, spacing: 2) {
-                                    Text("Trace to current VPN server")
-                                        .font(.subheadline)
-                                        .fontWeight(.medium)
-                                        .foregroundColor(.primary)
-                                    Text("\(server.flag) \(server.city) · \(server.serverAddress)")
-                                        .font(.caption)
-                                        .foregroundColor(.secondary)
+                                    Text(L10n.traceToServer)
+                                        .font(.subheadline).fontWeight(.medium).foregroundColor(.primary)
+                                    Text("\(server.localizedCityName(preferredLocale: languageManager.currentLanguageCode)) · \(server.serverAddress)")
+                                        .font(.caption).foregroundColor(.secondary)
                                 }
                                 Spacer()
-                                Image(systemName: "chevron.right")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
+                                Image(systemName: "chevron.right").font(.caption).foregroundColor(.secondary)
                             }
                             .padding(14)
                             .background(Color(.secondarySystemBackground))
                             .cornerRadius(12)
                         }
                         .buttonStyle(.plain)
-                        .padding(.horizontal, 20)
+                        .padding(.horizontal, 16)
                     }
 
-                    // Empty state / fox
+                    // Empty state
                     if tracerouteService.hops.isEmpty && !tracerouteService.isRunning {
-                        VStack(spacing: 16) {
-                            FoxMascotView(state: .tracing)
-                                .frame(height: 120)
-                            Text("Enter an IP or domain to trace the path")
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                                .multilineTextAlignment(.center)
+                        VStack(spacing: 10) {
+                            Image(systemName: "point.topleft.down.to.point.bottomright.curvepath")
+                                .font(.system(size: 40)).foregroundColor(.secondary.opacity(0.4))
+                            Text(L10n.enterIpOrDomain)
+                                .font(.subheadline).foregroundColor(.secondary).multilineTextAlignment(.center)
                         }
-                        .padding(.top, 24)
-                        .padding(.horizontal, 40)
+                        .padding(.top, 16).padding(.horizontal, 40)
                     } else {
-                        // Map of hops
-                        if !tracerouteService.hops.isEmpty {
-                            TracerouteMapView(hops: tracerouteService.hops)
-                                .frame(height: 180)
-                                .clipShape(RoundedRectangle(cornerRadius: 14))
-                                .padding(.horizontal, 20)
-                        }
-
                         // Hop list
                         LazyVStack(spacing: 0) {
                             ForEach(Array(tracerouteService.hops.enumerated()), id: \.element.id) { index, hop in
                                 HStack(spacing: 12) {
-                                    // Hop number badge
-                                    Text("\(hop.hopNumber)")
-                                        .font(.caption)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(.white)
-                                        .frame(width: 28, height: 28)
-                                        .background(hop.status == .timeout ? Color.orange : Color.blue)
-                                        .clipShape(Circle())
-
-                                    if let flag = hop.flagEmoji {
-                                        Text(flag)
-                                            .font(.title3)
-                                    }
+                                    if let flag = hop.flagEmoji { Text(flag).font(.title3) }
 
                                     VStack(alignment: .leading, spacing: 2) {
-                                        Text(hop.host)
-                                            .font(.subheadline)
-                                            .fontWeight(.medium)
-                                            .foregroundColor(.primary)
-                                        if let ip = hop.ip {
-                                            Text(ip)
-                                                .font(.caption)
-                                                .foregroundColor(.secondary)
-                                        }
+                                        Text(hop.host).font(.subheadline).fontWeight(.medium).foregroundColor(.primary)
+                                        if let ip = hop.ip { Text(ip).font(.caption).foregroundColor(.secondary) }
                                     }
-
                                     Spacer()
-
                                     if let latency = hop.latencyMs {
                                         Text(String(format: "%.0f ms", latency))
-                                            .font(.subheadline)
-                                            .fontWeight(.semibold)
+                                            .font(.subheadline).fontWeight(.semibold)
                                             .foregroundColor(latency < 50 ? .green : (latency < 100 ? .orange : .red))
                                     } else if hop.status == .timeout {
-                                        Text("* * *")
-                                            .font(.caption)
-                                            .foregroundColor(.orange)
+                                        Text("* * *").font(.caption).foregroundColor(.orange)
                                     }
                                 }
-                                .padding(.vertical, 12)
-                                .padding(.horizontal, 20)
+                                .padding(.vertical, 12).padding(.horizontal, 16)
                                 .accessibilityElement(children: .combine)
-                                .accessibilityLabel("Hop \(hop.hopNumber), \(hop.host)\(hop.ip.map { ", \($0)" } ?? "")\(hop.latencyMs.map { ", \(Int($0)) milliseconds" } ?? "")")
 
                                 if index < tracerouteService.hops.count - 1 {
-                                    Divider().padding(.leading, 60)
+                                    Divider().padding(.leading, 44)
                                 }
                             }
                         }
                         .background(Color(.secondarySystemBackground))
                         .cornerRadius(14)
-                        .padding(.horizontal, 20)
-
-                        // Fox done state
-                        if !tracerouteService.isRunning && !tracerouteService.hops.isEmpty {
-                            FoxMascotView(state: .tracing)
-                                .frame(height: 80)
-                        }
+                        .padding(.horizontal, 16)
                     }
 
                     Spacer().frame(height: 20)
                 }
-                .padding(.top, 10)
+                .padding(.top, 14)
             }
-            .background(
-                LinearGradient(
-                    colors: [Color(.systemBackground), Color(.secondarySystemBackground).opacity(0.5)],
-                    startPoint: .top, endPoint: .bottom
-                )
-            )
-            .navigationTitle("Tools")
-            .navigationBarTitleDisplayMode(.large)
         }
+        .background(Color(.systemBackground))
     }
 
     // Activate VPN with traceroute animation
@@ -747,7 +944,7 @@ struct NetworkView: View {
         }
 
         guard let server = selectedServer else {
-            statusMessage = "Please select a server first"
+            statusMessage = L10n.statusSelectServerFirst
             return
         }
 
@@ -838,11 +1035,6 @@ struct NetworkView: View {
                 VStack(alignment: .leading, spacing: 12) {
                     ForEach(tracerouteService.hops) { hop in
                         HStack {
-                            Text("\(hop.hopNumber)")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                                .frame(width: 30)
-                            
                             if let flag = hop.flagEmoji {
                                 Text(flag)
                                     .font(.title3)
@@ -906,7 +1098,7 @@ struct NetworkView: View {
                             Text(String(format: "%.1f", result.downloadSpeedMbps))
                                 .font(.system(size: 36, weight: .bold))
                                 .foregroundColor(.primary)
-                            Text("Mbps Download")
+                            Text(L10n.mbpsDownload)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                         }
@@ -918,7 +1110,7 @@ struct NetworkView: View {
                             Text(String(format: "%.1f", result.uploadSpeedMbps))
                                 .font(.system(size: 36, weight: .bold))
                                 .foregroundColor(.primary)
-                            Text("Mbps Upload")
+                            Text(L10n.mbpsUpload)
                                 .font(.subheadline)
                                 .foregroundColor(.secondary)
                         }
@@ -943,10 +1135,10 @@ struct NetworkView: View {
                             .foregroundColor(.primary)
                         
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("VPN Protection")
+                            Text(L10n.vpnProtection)
                                 .font(.headline)
                                 .foregroundColor(.primary)
-                            Text(isConnected ? "Connected" : "Disconnected")
+                            Text(isConnected ? L10n.connected : L10n.disconnected)
                                 .font(.caption)
                                 .foregroundColor(isConnected ? .green : .secondary)
                         }
@@ -958,10 +1150,22 @@ struct NetworkView: View {
                         HStack(spacing: 12) {
                             Text(server.flag).font(.system(size: 24))
                             VStack(alignment: .leading, spacing: 2) {
-                                Text(server.name)
-                                    .font(.caption)
-                                    .foregroundColor(.primary)
-                                Text("Auto-selected")
+                                HStack(spacing: 6) {
+                                    Text(server.localizedCityName(preferredLocale: languageManager.currentLanguageCode))
+                                        .font(.caption)
+                                        .foregroundColor(.primary)
+                                    if server.hasVlessConfig {
+                                        Text(L10n.vless)
+                                            .font(.caption2)
+                                            .fontWeight(.semibold)
+                                            .foregroundColor(.cyan)
+                                            .padding(.horizontal, 5)
+                                            .padding(.vertical, 2)
+                                            .background(Color.cyan.opacity(0.2))
+                                            .cornerRadius(4)
+                                    }
+                                }
+                                Text(L10n.autoSelected)
                                     .font(.caption2)
                                     .foregroundColor(.secondary)
                             }
@@ -972,7 +1176,7 @@ struct NetworkView: View {
                     Button(action: isConnected ? disconnectVPN : setupAndConnectVPN) {
                         HStack(spacing: 12) {
                             Image(systemName: "power")
-                            Text(isConnected ? "Disconnect" : "Connect VPN")
+                            Text(isConnected ? L10n.disconnectVpn : L10n.connectVpn)
                                 .font(.headline)
                         }
                         .frame(maxWidth: .infinity)
@@ -999,7 +1203,7 @@ struct NetworkView: View {
                     .frame(width: geometry.size.width)
                 }
             }
-            .navigationTitle("Protection")
+            .navigationTitle(L10n.protectionTabTitle)
             .navigationBarTitleDisplayMode(.large)
         }
     }
@@ -1016,10 +1220,10 @@ struct NetworkView: View {
                             Image(systemName: "crown.fill")
                                 .foregroundColor(.yellow)
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("Subscriptions")
+                                Text(L10n.subscriptions)
                                     .font(.headline)
                                     .foregroundColor(.primary)
-                                Text("Manage your premium subscription")
+                                Text(L10n.manageSubscription)
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                             }
@@ -1044,10 +1248,10 @@ struct NetworkView: View {
                             Image(systemName: "gift.fill")
                                 .foregroundColor(.cyan)
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("Redeem Offer Code")
+                                Text(L10n.redeemCode)
                                     .font(.headline)
                                     .foregroundColor(.primary)
-                                Text("Enter a promo or offer code")
+                                Text(L10n.enterPromoCode)
                                     .font(.caption)
                                     .foregroundColor(.secondary)
                             }
@@ -1065,13 +1269,13 @@ struct NetworkView: View {
                     HStack(spacing: 12) {
                         Image(systemName: "paintbrush.fill")
                             .foregroundColor(.purple)
-                        Text("Appearance")
+                        Text(L10n.appearance)
                             .font(.headline)
                             .foregroundColor(.primary)
                         Spacer()
                         Picker("Theme", selection: $appTheme) {
-                            Text("Light").tag("light")
-                            Text("Dark").tag("dark")
+                            Text(L10n.light).tag("light")
+                            Text(L10n.dark).tag("dark")
                         }
                         .pickerStyle(.segmented)
                         .frame(width: 140)
@@ -1079,6 +1283,62 @@ struct NetworkView: View {
                     .padding(16)
                     .background(Color.secondary.opacity(0.1))
                     .cornerRadius(12)
+
+                    // Language Picker
+                    Button(action: { showingLanguagePicker = true }) {
+                        HStack {
+                            Image(systemName: "globe")
+                                .foregroundColor(.blue)
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text(L10n.settingsLanguage)
+                                    .font(.headline)
+                                    .foregroundColor(.primary)
+                                Text(LanguageManager.supportedLanguages.first { $0.code == languageManager.currentLanguageCode }?.nativeName ?? "English")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                                .foregroundColor(.secondary)
+                        }
+                        .padding(16)
+                        .background(Color.secondary.opacity(0.1))
+                        .cornerRadius(12)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .sheet(isPresented: $showingLanguagePicker) {
+                        NavigationStack {
+                            List(LanguageManager.supportedLanguages, id: \.code) { lang in
+                                Button(action: {
+                                    languageManager.currentLanguageCode = lang.code
+                                    showingLanguagePicker = false
+                                }) {
+                                    HStack {
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text(lang.nativeName)
+                                                .font(.body)
+                                                .foregroundColor(.primary)
+                                            Text(lang.name)
+                                                .font(.caption)
+                                                .foregroundColor(.secondary)
+                                        }
+                                        Spacer()
+                                        if languageManager.currentLanguageCode == lang.code {
+                                            Image(systemName: "checkmark")
+                                                .foregroundColor(.blue)
+                                        }
+                                    }
+                                }
+                            }
+                            .navigationTitle(L10n.settingsLanguage)
+                            .navigationBarTitleDisplayMode(.inline)
+                            .toolbar {
+                                ToolbarItem(placement: .cancellationAction) {
+                                    Button("Done") { showingLanguagePicker = false }
+                                }
+                            }
+                        }
+                    }
 
                     // Privacy Policy
                     Button(action: {
@@ -1089,7 +1349,7 @@ struct NetworkView: View {
                         HStack {
                             Image(systemName: "hand.raised.fill")
                                 .foregroundColor(.green)
-                            Text("Privacy Policy")
+                            Text(L10n.privacyPolicy)
                                 .font(.headline)
                                 .foregroundColor(.primary)
                             Spacer()
@@ -1111,7 +1371,7 @@ struct NetworkView: View {
                         HStack {
                             Image(systemName: "doc.text.fill")
                                 .foregroundColor(.orange)
-                            Text("Terms of Use")
+                            Text(L10n.termsOfUse)
                                 .font(.headline)
                                 .foregroundColor(.primary)
                             Spacer()
@@ -1125,18 +1385,18 @@ struct NetworkView: View {
                     // App Info
                     VStack(alignment: .leading, spacing: 12) {
                         HStack {
-                            Text("App Name")
+                            Text(L10n.appName)
                                 .foregroundColor(.secondary)
                             Spacer()
-                            Text("FoxyWall")
+                            Text(L10n.appNameValue)
                                 .foregroundColor(.primary)
                         }
                         Divider()
                         HStack {
-                            Text("Version")
+                            Text(L10n.version)
                                 .foregroundColor(.secondary)
                             Spacer()
-                            Text("2.10")
+                            Text(L10n.versionValue)
                                 .foregroundColor(.primary)
                         }
                     }
@@ -1147,7 +1407,7 @@ struct NetworkView: View {
                 .padding(.horizontal, 20)
                 .padding(.top, 10)
             }
-            .navigationTitle("Settings")
+            .navigationTitle(L10n.profileTitle)
             .navigationBarTitleDisplayMode(.large)
         }
     }
@@ -1200,7 +1460,7 @@ struct NetworkView: View {
                     // Handle simulator-specific VPN errors gracefully
                     if error.localizedDescription.contains("IPC failed") || 
                        error.localizedDescription.contains("Connection invalid") {
-                        self.statusMessage = "VPN not available in simulator - use real device for VPN testing"
+                        self.statusMessage = L10n.statusVpnSimulator
                     } else {
                         self.statusMessage = "Error checking VPN status: \(error.localizedDescription)"
                     }
@@ -1290,25 +1550,25 @@ struct NetworkView: View {
 
         // Check if running in simulator
         #if targetEnvironment(simulator)
-        statusMessage = "VPN functionality not available in iOS Simulator. Please test on a real device."
+        statusMessage = L10n.statusVpnSimulator
         return
         #endif
 
         // Ensure a server is selected
         guard let server = selectedServer else {
-            statusMessage = "Please select a server first"
+            statusMessage = L10n.statusSelectServerFirst
             return
         }
 
         // Ensure server has credentials
         guard let username = server.openvpnUsername,
               let password = server.openvpnPassword else {
-            statusMessage = "Server credentials not available"
+            statusMessage = L10n.statusServerCredentialsNotAvailable
             return
         }
         
         isLoading = true
-        statusMessage = "Connecting to \(server.name)..."
+        statusMessage = L10n.statusConnecting(server.localizedCityName(preferredLocale: languageManager.currentLanguageCode))
         
         let serverAddress = server.serverAddress
         
@@ -1464,7 +1724,7 @@ struct NetworkView: View {
     private func disconnectVPN() {
         // Check if running in simulator
         #if targetEnvironment(simulator)
-        statusMessage = "VPN functionality not available in iOS Simulator."
+        statusMessage = L10n.statusVpnSimulator
         return
         #endif
         
@@ -1538,7 +1798,9 @@ statusMessage = ""
                     }
                     
                     self.vpnServers = sortedServers
-                    
+                    self.serverLatencies.removeAll()
+                    self.startServerPings()
+
                     // Set Stockholm (free server) as default if none selected
                     // The user specifically wants Sweden preselected
                     if self.selectedServer == nil {
@@ -1558,12 +1820,22 @@ statusMessage = ""
                         }
                     }
                     
-                    self.statusMessage = "Loaded \(servers.count) VPN servers"
+                    self.statusMessage = L10n.statusLoadedServers(servers.count)
                     
                 case .failure(let error):
-                    self.statusMessage = "Failed to load servers: \(error.localizedDescription)"
+                    self.statusMessage = String(format: L10n.statusFailedLoadServers, error.localizedDescription)
                     // Fallback to default server if Supabase fails
                 }
+            }
+        }
+    }
+    
+    /// Pre-fills all servers with a default good latency so bars show immediately.
+    private func startServerPings() {
+        guard !vpnServers.isEmpty else { return }
+        for server in vpnServers {
+            if serverLatencies[server.id] == nil {
+                serverLatencies[server.id] = 50
             }
         }
     }
@@ -1598,7 +1870,7 @@ public struct SettingsView: View {
         VStack {
             // Custom header for macOS
             HStack {
-                Text("Settings")
+                Text(L10n.settingsTabTitle)
                     .font(.title2)
                     .fontWeight(.bold)
                 Spacer()
@@ -1623,7 +1895,7 @@ public struct SettingsView: View {
             
             Section("Device Info") {
                 HStack {
-                    Text("Local IP Address")
+                    Text(L10n.localIpAddress)
                     Spacer()
                     Text(getLocalIPAddress())
                         .foregroundColor(.gray)
@@ -1644,21 +1916,21 @@ public struct SettingsView: View {
             
             Section("About") {
                 HStack {
-                    Text("Version")
+                    Text(L10n.version)
                     Spacer()
-                    Text("2.10")
+                    Text(L10n.versionValue)
                         .foregroundColor(.gray)
                 }
                 
                 HStack {
-                    Text("App Name")
+                    Text(L10n.appName)
                     Spacer()
-                    Text("FoxyWall")
+                    Text(L10n.appNameValue)
                         .foregroundColor(.gray)
                 }
             }
         }
-        .navigationTitle("Settings")
+        .navigationTitle(L10n.settingsTabTitle)
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
@@ -1750,7 +2022,7 @@ struct EULAView: View {
                         .padding()
                 }
             }
-            .navigationTitle("End User License Agreement")
+            .navigationTitle(L10n.eulaTitle)
             #if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             #endif
@@ -1918,7 +2190,7 @@ struct SpeedtestGaugeView: View {
     @ViewBuilder
     private func centerContent(center: CGPoint) -> some View {
         if !isRunning && !hasResult {
-            Text("GO")
+            Text(L10n.go)
                 .font(.system(size: 48, weight: .bold, design: .rounded))
                 .foregroundColor(.cyan)
                 .position(center)
@@ -1931,7 +2203,7 @@ struct SpeedtestGaugeView: View {
                     Circle()
                         .fill(Color.green)
                         .frame(width: 8, height: 8)
-                    Text("Mbps")
+                    Text(L10n.mbps)
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                 }
@@ -2040,7 +2312,7 @@ struct TracerouteSheetView: View {
                         Image(systemName: "point.topleft.down.to.point.bottomright.curvepath")
                             .font(.system(size: 50))
                             .foregroundColor(.secondary.opacity(0.5))
-                        Text("Enter an IP or domain to trace")
+                        Text(L10n.enterIpOrDomainShort)
                             .foregroundColor(.secondary)
                     }
                     Spacer()
@@ -2049,14 +2321,6 @@ struct TracerouteSheetView: View {
                         LazyVStack(spacing: 0) {
                             ForEach(Array(tracerouteService.hops.enumerated()), id: \.element.id) { index, hop in
                                 HStack(spacing: 12) {
-                                    Text("\(hop.hopNumber)")
-                                        .font(.caption)
-                                        .fontWeight(.bold)
-                                        .foregroundColor(.white)
-                                        .frame(width: 28, height: 28)
-                                        .background(hop.status == .timeout ? Color.orange : Color.blue)
-                                        .clipShape(Circle())
-
                                     if let flag = hop.flagEmoji {
                                         Text(flag)
                                             .font(.title3)
@@ -2091,7 +2355,7 @@ struct TracerouteSheetView: View {
 
                                 if index < tracerouteService.hops.count - 1 {
                                     Divider()
-                                        .padding(.leading, 60)
+                                        .padding(.leading, 44)
                                 }
                             }
                         }
@@ -2100,7 +2364,7 @@ struct TracerouteSheetView: View {
                 }
             }
             .background(Color(.systemBackground))
-            .navigationTitle("Traceroute")
+            .navigationTitle(L10n.tracerouteTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {

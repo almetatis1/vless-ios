@@ -94,6 +94,97 @@ class PingService: ObservableObject {
         pingTasks.append(task)
     }
     
+    /// Single ping for one host; returns latency in ms. Uses TCP port 443 first,
+    /// falls back to HTTP HEAD if TCP fails. Hard 2-second timeout. Never returns nil —
+    /// on total failure returns 999 (shown as 1 red bar) so the spinner always resolves.
+    func pingOnce(host: String) async -> Double? {
+        let start = Date()
+
+        // --- Attempt 1: TCP connect to port 443 with 2s hard timeout ---
+        let tcpMs = await withTaskGroup(of: Double?.self) { group in
+            group.addTask {
+                await self.tcpPing(host: host, port: .https)
+            }
+            group.addTask {
+                try? await Task.sleep(nanoseconds: 2_000_000_000)
+                return Optional<Double>.none
+            }
+            // Return first non-nil result OR nil if timeout wins
+            for await result in group {
+                group.cancelAll()
+                if let ms = result { return Optional(ms) }
+            }
+            return Optional<Double>.none
+        }
+
+        if let ms = tcpMs { return ms }
+
+        // --- Attempt 2: HTTP HEAD fallback on port 80 with remaining time ---
+        let elapsed = Date().timeIntervalSince(start) * 1000
+        let remaining = max(500, 2000 - elapsed) // at least 500 ms for fallback
+
+        let httpMs = await withTaskGroup(of: Double?.self) { group in
+            group.addTask {
+                await self.httpHeadPing(host: host)
+            }
+            group.addTask {
+                try? await Task.sleep(nanoseconds: UInt64(remaining) * 1_000_000)
+                return Optional<Double>.none
+            }
+            for await result in group {
+                group.cancelAll()
+                if let ms = result { return Optional(ms) }
+            }
+            return Optional<Double>.none
+        }
+
+        // Return measured value or 999 (1 red bar) so spinner always resolves
+        return httpMs ?? 999
+    }
+
+    private func tcpPing(host: String, port: NWEndpoint.Port) async -> Double? {
+        let start = Date()
+        let connection = NWConnection(host: NWEndpoint.Host(host), port: port, using: .tcp)
+        return await withCheckedContinuation { continuation in
+            var done = false
+            connection.stateUpdateHandler = { state in
+                guard !done else { return }
+                switch state {
+                case .ready:
+                    done = true
+                    connection.cancel()
+                    continuation.resume(returning: Date().timeIntervalSince(start) * 1000)
+                case .failed:
+                    done = true
+                    connection.cancel()
+                    continuation.resume(returning: Optional<Double>.none)
+                default: break
+                }
+            }
+            connection.start(queue: .global())
+        }
+    }
+
+    private func httpHeadPing(host: String) async -> Double? {
+        let urlString = "http://\(host)"
+        guard let url = URL(string: urlString) else { return nil }
+        var request = URLRequest(url: url)
+        request.httpMethod = "HEAD"
+        request.timeoutInterval = 2
+        let start = Date()
+        do {
+            let config = URLSessionConfiguration.ephemeral
+            config.timeoutIntervalForRequest = 2
+            let session = URLSession(configuration: config)
+            _ = try await session.data(for: request)
+            return Date().timeIntervalSince(start) * 1000
+        } catch {
+            // If we got any response (even error status), extract latency
+            let ms = Date().timeIntervalSince(start) * 1000
+            return ms < 1900 ? ms : nil // only count if it responded before timeout
+        }
+    }
+    
     private func performPing(host: String, displayName: String? = nil) async -> PingResult {
         let startTime = Date()
         

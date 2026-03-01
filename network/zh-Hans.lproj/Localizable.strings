@@ -1,0 +1,95 @@
+/* Chinese Simplified (zh-Hans) */
+"onboarding.welcome.title" = "欢迎使用 FoxyWall";
+"onboarding.welcome.subtitle" = "您的隐私守护伴侣。\n一键保护您的网络连接。";
+"onboarding.vpn.title" = "VPN 保护";
+"onboarding.vpn.subtitle" = "连接全球服务器，即时加密您的所有网络流量。";
+"onboarding.speed.title" = "网速测试";
+"onboarding.speed.subtitle" = "一键测量下载速度、上传速度、延迟和抖动。";
+"onboarding.tools.title" = "网络工具";
+"onboarding.tools.subtitle" = "追踪数据在互联网上的路由路径，诊断网络连接问题。";
+"onboarding.ready.title" = "准备就绪";
+"onboarding.ready.subtitle" = "无日志，无追踪。\n您的数据始终属于您。";
+"onboarding.continue" = "继续";
+"onboarding.legal" = "继续即表示您接受我们的隐私政策和使用条款。";
+
+"general.done" = "完成";
+"general.back" = "返回";
+"general.refresh" = "刷新";
+"general.connect" = "连接";
+"general.disconnect" = "断开";
+"general.connecting" = "连接中...";
+"general.encrypt" = "加密";
+"general.protected" = "已保护";
+"general.not_protected" = "未受保护";
+"general.select_server" = "选择服务器";
+"general.select_vpn_server" = "选择 VPN 服务器";
+"general.no_servers" = "暂无可用服务器";
+"general.loading_servers" = "正在加载服务器...";
+"general.vless" = "VLESS";
+"general.auto_selected" = "自动选择";
+"general.servers_tab" = "服务器";
+
+"vpn.tab_title" = "连接";
+"vpn.fox_guarding" = "正在从 %@ 保护您";
+"vpn.connection_not_secure" = "您的连接不安全";
+
+"speed.tab_title" = "速度";
+"speed.download_mbps" = "下载 Mbps";
+"speed.upload_mbps" = "上传 Mbps";
+"speed.ping" = "延迟";
+"speed.jitter" = "抖动";
+"speed.ms" = "毫秒";
+"speed.vpn_active_note" = "VPN 已启用 · 结果反映受保护的网速";
+"speed.mbps" = "Mbps";
+"speed.mbps_download" = "Mbps 下载";
+"speed.mbps_upload" = "Mbps 上传";
+"speed.go" = "开始";
+"speed.tap_to_measure" = "点击测量";
+"speed.speed_test" = "网速测试";
+
+"speed_phase.ready" = "就绪";
+"speed_phase.testing_ping" = "测试延迟中...";
+"speed_phase.testing_download" = "测试下载速度中...";
+"speed_phase.testing_upload" = "测试上传速度中...";
+"speed_phase.complete" = "完成";
+
+"tools.tab_title" = "工具";
+"tools.trace_to_server" = "追踪至当前 VPN 服务器";
+"tools.enter_ip_domain" = "输入 IP 或域名以追踪路由";
+"tools.traceroute_title" = "路由追踪";
+"tools.smart_route" = "智能路由";
+"tools.enter_ip_short" = "输入 IP 或域名进行追踪";
+
+"protection.tab_title" = "保护";
+"protection.vpn_protection" = "VPN 保护";
+"protection.connected" = "已连接";
+"protection.disconnected" = "已断开";
+"protection.connect_vpn" = "连接 VPN";
+"protection.disconnect_vpn" = "断开 VPN";
+
+"settings.tab_title" = "设置";
+"settings.subscriptions" = "订阅";
+"settings.manage_subscription" = "管理您的高级订阅";
+"settings.redeem_code" = "兑换优惠码";
+"settings.enter_promo" = "输入促销码或优惠码";
+"settings.appearance" = "外观";
+"settings.light" = "浅色";
+"settings.dark" = "深色";
+"settings.privacy_policy" = "隐私政策";
+"settings.terms_of_use" = "使用条款";
+"settings.app_name" = "应用名称";
+"settings.app_name_value" = "FoxyWall";
+"settings.version" = "版本";
+"settings.version_value" = "2.11";
+"settings.local_ip" = "本地 IP 地址";
+"settings.device_info" = "设备信息";
+"settings.eula_title" = "最终用户许可协议";
+"settings.language" = "语言";
+"settings.profile" = "个人资料";
+
+"status.connecting_format" = "正在连接到 %@...";
+"status.select_server_first" = "请先选择服务器";
+"status.server_credentials" = "服务器凭据不可用";
+"status.vpn_simulator" = "VPN 功能在 iOS 模拟器中不可用，请在真机上测试。";
+"status.failed_load_servers" = "加载服务器失败：%@";
+"status.loaded_servers_format" = "已加载 %d 个 VPN 服务器";

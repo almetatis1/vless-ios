@@ -1,0 +1,103 @@
+/* Onboarding */
+"onboarding.welcome.title" = "Welcome to FoxyWall";
+"onboarding.welcome.subtitle" = "Your privacy companion.\nSecure your connection with one tap.";
+"onboarding.vpn.title" = "VPN Protection";
+"onboarding.vpn.subtitle" = "Connect to servers worldwide and encrypt all your internet traffic instantly.";
+"onboarding.speed.title" = "Speed Test";
+"onboarding.speed.subtitle" = "Measure your download, upload, ping, and jitter with a single tap.";
+"onboarding.tools.title" = "Network Tools";
+"onboarding.tools.subtitle" = "Trace the route your data takes across the internet and diagnose connection issues.";
+"onboarding.ready.title" = "Ready to Go";
+"onboarding.ready.subtitle" = "No logs. No tracking.\nYour data stays yours.";
+"onboarding.continue" = "Continue";
+"onboarding.legal" = "By continuing, you accept our Privacy Policy and Terms of Use.";
+
+/* General */
+"general.done" = "Done";
+"general.back" = "Back";
+"general.refresh" = "Refresh";
+"general.connect" = "Connect";
+"general.disconnect" = "Disconnect";
+"general.connecting" = "Connecting...";
+"general.encrypt" = "Encrypt";
+"general.protected" = "Protected";
+"general.not_protected" = "Not Protected";
+"general.select_server" = "Select Server";
+"general.select_vpn_server" = "Select VPN Server";
+"general.no_servers" = "No servers available";
+"general.loading_servers" = "Loading servers...";
+"general.vless" = "VLESS";
+"general.auto_selected" = "Auto-selected";
+"general.servers_tab" = "Servers";
+
+/* VPN tab */
+"vpn.tab_title" = "Connect";
+"vpn.fox_guarding" = "Fox is guarding from %@";
+"vpn.connection_not_secure" = "Your connection is not secure";
+
+/* Speed tab */
+"speed.tab_title" = "Speed";
+"speed.download_mbps" = "Download Mbps";
+"speed.upload_mbps" = "Upload Mbps";
+"speed.ping" = "Ping";
+"speed.jitter" = "Jitter";
+"speed.ms" = "ms";
+"speed.vpn_active_note" = "VPN is active · results reflect protected speed";
+"speed.mbps" = "Mbps";
+"speed.mbps_download" = "Mbps Download";
+"speed.mbps_upload" = "Mbps Upload";
+"speed.go" = "GO";
+"speed.tap_to_measure" = "Tap to measure";
+"speed.speed_test" = "Speed Test";
+
+/* Speed test phases */
+"speed_phase.ready" = "Ready";
+"speed_phase.testing_ping" = "Testing Ping...";
+"speed_phase.testing_download" = "Testing Download Speed...";
+"speed_phase.testing_upload" = "Testing Upload Speed...";
+"speed_phase.complete" = "Complete";
+
+/* Tools */
+"tools.tab_title" = "Tools";
+"tools.trace_to_server" = "Trace to current VPN server";
+"tools.enter_ip_domain" = "Enter an IP or domain to trace the path";
+"tools.traceroute_title" = "Traceroute";
+"tools.smart_route" = "Smart Route";
+"tools.enter_ip_short" = "Enter an IP or domain to trace";
+
+/* Protection */
+"protection.tab_title" = "Protection";
+"protection.vpn_protection" = "VPN Protection";
+"protection.connected" = "Connected";
+"protection.disconnected" = "Disconnected";
+"protection.connect_vpn" = "Connect VPN";
+"protection.disconnect_vpn" = "Disconnect VPN";
+
+/* Settings */
+"settings.tab_title" = "Settings";
+"settings.subscriptions" = "Subscriptions";
+"settings.manage_subscription" = "Manage your premium subscription";
+"settings.redeem_code" = "Redeem Offer Code";
+"settings.enter_promo" = "Enter a promo or offer code";
+"settings.appearance" = "Appearance";
+"settings.light" = "Light";
+"settings.dark" = "Dark";
+"settings.privacy_policy" = "Privacy Policy";
+"settings.terms_of_use" = "Terms of Use";
+"settings.app_name" = "App Name";
+"settings.app_name_value" = "FoxyWall";
+"settings.version" = "Version";
+"settings.version_value" = "2.11";
+"settings.local_ip" = "Local IP Address";
+"settings.device_info" = "Device Info";
+"settings.eula_title" = "End User License Agreement";
+"settings.language" = "Language";
+"settings.profile" = "Profile";
+
+/* Status */
+"status.connecting_format" = "Connecting to %@...";
+"status.select_server_first" = "Please select a server first";
+"status.server_credentials" = "Server credentials not available";
+"status.vpn_simulator" = "VPN functionality not available in iOS Simulator. Please test on a real device.";
+"status.failed_load_servers" = "Failed to load servers: %@";
+"status.loaded_servers_format" = "Loaded %d VPN servers";

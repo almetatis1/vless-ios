@@ -3,20 +3,25 @@ import SwiftUI
 // MARK: - Tab Item Enum
 enum AppTab: String, CaseIterable {
     case vpn = "VPN"
-    case scanner = "Speed"
-    case tools = "Tools"
-    case settings = "Settings"
+    case servers = "Servers"
+    case profile = "Profile"
 
     var icon: String {
         switch self {
         case .vpn:
-            return "globe"
-        case .scanner:
-            return "speedometer"
-        case .tools:
-            return "point.topleft.down.to.point.bottomright.curvepath.fill"
-        case .settings:
-            return "gearshape.fill"
+            return "shield.fill"
+        case .servers:
+            return "server.rack"
+        case .profile:
+            return "person.fill"
+        }
+    }
+
+    var localizedTitle: String {
+        switch self {
+        case .vpn: return L10n.vpnTabTitle
+        case .servers: return L10n.serversTabTitle
+        case .profile: return L10n.settingsTabTitle
         }
     }
 }
@@ -80,7 +85,7 @@ struct GlassTabBar: View {
             .padding(.top, 8)
             .padding(.bottom, 8)
         }
-        .background(.ultraThinMaterial)
+        .background(Color(.systemBackground))
         .ignoresSafeArea(edges: .bottom)
     }
 }
@@ -94,43 +99,16 @@ struct TabBarItem: View {
     
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 6) {
+            VStack(spacing: 4) {
                 Image(systemName: tab.icon)
-                    .font(.system(size: 24, weight: isSelected ? .semibold : .regular))
-                    .foregroundStyle(
-                        isSelected ?
-                        LinearGradient(
-                            colors: [Color.white, Color.white.opacity(0.9)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ) :
-                        LinearGradient(
-                            colors: [Color.gray.opacity(0.6), Color.gray.opacity(0.6)],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
+                    .font(.system(size: 22, weight: isSelected ? .semibold : .regular))
+                    .foregroundColor(isSelected ? Color(red: 0.2, green: 0.6, blue: 0.9) : Color.gray.opacity(0.6))
+                Text(tab.localizedTitle)
+                    .font(.system(size: 10, weight: isSelected ? .semibold : .regular))
+                    .foregroundColor(isSelected ? Color(red: 0.2, green: 0.6, blue: 0.9) : Color.gray.opacity(0.6))
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 12)
-            .background(
-                ZStack {
-                    if isSelected {
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(
-                                LinearGradient(
-                                    colors: [
-                                        Color.white.opacity(0.2),
-                                        Color.white.opacity(0.1)
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                            .matchedGeometryEffect(id: "tab", in: namespace)
-                    }
-                }
-            )
+            .padding(.vertical, 10)
         }
         .buttonStyle(PlainButtonStyle())
     }

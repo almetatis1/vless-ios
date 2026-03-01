@@ -1,0 +1,95 @@
+/* Arabic (ar) - RTL */
+"onboarding.welcome.title" = "مرحباً بك في FoxyWall";
+"onboarding.welcome.subtitle" = "رفيقك للخصوصية.\nاحمِ اتصالك بنقرة واحدة.";
+"onboarding.vpn.title" = "حماية VPN";
+"onboarding.vpn.subtitle" = "اتصل بخوادم حول العالم وشفّر كل حركة الإنترنت فوراً.";
+"onboarding.speed.title" = "اختبار السرعة";
+"onboarding.speed.subtitle" = "قياس التحميل والرفع والبنغ والجيتر بنقرة واحدة.";
+"onboarding.tools.title" = "أدوات الشبكة";
+"onboarding.tools.subtitle" = "تتبع مسار بياناتك عبر الإنترنت وتشخيص مشاكل الاتصال.";
+"onboarding.ready.title" = "جاهز للانطلاق";
+"onboarding.ready.subtitle" = "بدون سجلات. بدون تتبع.\nبياناتك تبقى ملكك.";
+"onboarding.continue" = "متابعة";
+"onboarding.legal" = "بالمتابعة، أنت توافق على سياسة الخصوصية وشروط الاستخدام.";
+
+"general.done" = "تم";
+"general.back" = "رجوع";
+"general.refresh" = "تحديث";
+"general.connect" = "اتصال";
+"general.disconnect" = "قطع الاتصال";
+"general.connecting" = "جاري الاتصال...";
+"general.encrypt" = "تشفير";
+"general.protected" = "محمي";
+"general.not_protected" = "غير محمي";
+"general.select_server" = "اختر خادماً";
+"general.select_vpn_server" = "اختر خادم VPN";
+"general.no_servers" = "لا توجد خوادم متاحة";
+"general.loading_servers" = "جاري تحميل الخوادم...";
+"general.vless" = "VLESS";
+"general.auto_selected" = "محدد تلقائياً";
+"general.servers_tab" = "الخوادم";
+
+"vpn.tab_title" = "اتصال";
+"vpn.fox_guarding" = "الثعلب يحميك من %@";
+"vpn.connection_not_secure" = "اتصالك غير آمن";
+
+"speed.tab_title" = "السرعة";
+"speed.download_mbps" = "تحميل Mbps";
+"speed.upload_mbps" = "رفع Mbps";
+"speed.ping" = "البينغ";
+"speed.jitter" = "الجيتر";
+"speed.ms" = "ms";
+"speed.vpn_active_note" = "VPN نشط · النتائج تعكس السرعة المحمية";
+"speed.mbps" = "Mbps";
+"speed.mbps_download" = "Mbps تحميل";
+"speed.mbps_upload" = "Mbps رفع";
+"speed.go" = "ابدأ";
+"speed.tap_to_measure" = "اضغط للقياس";
+"speed.speed_test" = "اختبار السرعة";
+
+"speed_phase.ready" = "جاهز";
+"speed_phase.testing_ping" = "جاري اختبار البينغ...";
+"speed_phase.testing_download" = "جاري اختبار سرعة التحميل...";
+"speed_phase.testing_upload" = "جاري اختبار سرعة الرفع...";
+"speed_phase.complete" = "مكتمل";
+
+"tools.tab_title" = "أدوات";
+"tools.trace_to_server" = "تتبع إلى خادم VPN الحالي";
+"tools.enter_ip_domain" = "أدخل عنوان IP أو نطاقاً لتتبع المسار";
+"tools.traceroute_title" = "تتبع المسار";
+"tools.smart_route" = "المسار الذكي";
+"tools.enter_ip_short" = "أدخل IP أو نطاقاً للتتبع";
+
+"protection.tab_title" = "الحماية";
+"protection.vpn_protection" = "حماية VPN";
+"protection.connected" = "متصل";
+"protection.disconnected" = "غير متصل";
+"protection.connect_vpn" = "اتصل بـ VPN";
+"protection.disconnect_vpn" = "قطع اتصال VPN";
+
+"settings.tab_title" = "الإعدادات";
+"settings.subscriptions" = "الاشتراكات";
+"settings.manage_subscription" = "إدارة اشتراكك المميز";
+"settings.redeem_code" = "استرداد رمز العرض";
+"settings.enter_promo" = "أدخل رمز برومو أو عرض";
+"settings.appearance" = "المظهر";
+"settings.light" = "فاتح";
+"settings.dark" = "داكن";
+"settings.privacy_policy" = "سياسة الخصوصية";
+"settings.terms_of_use" = "شروط الاستخدام";
+"settings.app_name" = "اسم التطبيق";
+"settings.app_name_value" = "FoxyWall";
+"settings.version" = "الإصدار";
+"settings.version_value" = "2.11";
+"settings.local_ip" = "عنوان IP المحلي";
+"settings.device_info" = "معلومات الجهاز";
+"settings.eula_title" = "اتفاقية ترخيص المستخدم النهائي";
+"settings.language" = "اللغة";
+"settings.profile" = "الملف الشخصي";
+
+"status.connecting_format" = "جاري الاتصال بـ %@...";
+"status.select_server_first" = "يرجى اختيار خادم أولاً";
+"status.server_credentials" = "بيانات الخادم غير متاحة";
+"status.vpn_simulator" = "VPN غير متاح في المحاكي. يرجى الاختبار على جهاز حقيقي.";
+"status.failed_load_servers" = "فشل تحميل الخوادم: %@";
+"status.loaded_servers_format" = "تم تحميل %d خادم VPN";

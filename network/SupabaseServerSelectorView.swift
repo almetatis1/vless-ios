@@ -20,11 +20,11 @@ struct SupabaseServerSelectorView: View {
         VStack(spacing: 20) {
             // Header
             HStack {
-                Text("Select VPN Server")
+                Text(L10n.selectVpnServer)
                     .font(.title)
                     .fontWeight(.bold)
                 Spacer()
-                Button("Done") {
+                Button(L10n.done) {
                     dismiss()
                 }
                 .buttonStyle(.borderedProminent)
@@ -34,13 +34,13 @@ struct SupabaseServerSelectorView: View {
             
             // Content
             if isLoadingServers {
-                ProgressView("Loading servers...")
+                ProgressView(L10n.loadingServers)
                     .padding()
             } else if vpnServers.isEmpty {
                 VStack(spacing: 12) {
-                    Text("No servers available")
+                    Text(L10n.noServersAvailable)
                         .font(.headline)
-                    Button("Refresh") {
+                    Button(L10n.refresh) {
                         onRefresh()
                     }
                     .buttonStyle(.bordered)
@@ -73,42 +73,88 @@ struct SupabaseServerSelectorView: View {
 }
 
 // MARK: - Supabase Server Row Component
+struct PingBarsView: View {
+    let pingMs: Double?
+
+    private var filledBars: Int {
+        guard let ms = pingMs else { return 0 }
+        if ms < 60  { return 4 }
+        if ms < 120 { return 3 }
+        if ms < 200 { return 2 }
+        return 1
+    }
+
+    private var barColor: Color {
+        guard let ms = pingMs else { return .gray.opacity(0.3) }
+        if ms < 60  { return .green }
+        if ms < 120 { return Color(red: 0.6, green: 0.85, blue: 0.2) }
+        if ms < 200 { return .orange }
+        return .red
+    }
+
+    var body: some View {
+        if pingMs == nil {
+            ProgressView()
+                .scaleEffect(0.7)
+                .frame(width: 26, height: 22)
+        } else {
+            HStack(alignment: .bottom, spacing: 3) {
+                ForEach(0..<4, id: \.self) { i in
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(i < filledBars ? barColor : Color.gray.opacity(0.2))
+                        .frame(width: 5, height: CGFloat(6 + i * 4))
+                }
+            }
+        }
+    }
+}
+
 struct SupabaseServerRow: View {
     let server: VPNServer
     let isSelected: Bool
+    var pingMs: Double? = nil
     let onSelect: () -> Void
-    
+
     var body: some View {
         Button(action: onSelect) {
             HStack(spacing: 12) {
                 // Flag emoji
                 Text(server.flag)
                     .font(.system(size: 32))
-                
+
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("\(server.name) - \(server.city)")
+                    Text(server.localizedCityName(preferredLocale: LanguageManager.shared.currentLanguageCode))
                         .font(.body)
                         .fontWeight(.medium)
                         .foregroundColor(.primary)
-                    
+
                     HStack(spacing: 8) {
-                        // Status indicator
-                        Circle()
-                            .fill(server.isAvailable ? Color.green : Color.gray)
-                            .frame(width: 8, height: 8)
-                        
-                        Text(server.status.capitalized)
-                            .font(.caption)
-                            .foregroundColor(.secondary)
+                        if server.hasVlessConfig {
+                            Text(L10n.vless)
+                                .font(.caption2)
+                                .fontWeight(.semibold)
+                                .foregroundColor(.cyan)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Color.cyan.opacity(0.2))
+                                .cornerRadius(4)
+                        }
+                        if let ms = pingMs {
+                            Text("\(Int(round(ms))) ms")
+                                .font(.caption2)
+                                .foregroundColor(.secondary)
+                        }
                     }
                 }
-                
+
                 Spacer()
-                
+
                 if isSelected {
                     Image(systemName: "checkmark.circle.fill")
                         .foregroundColor(.green)
                         .font(.title2)
+                } else {
+                    PingBarsView(pingMs: pingMs)
                 }
             }
             .padding()

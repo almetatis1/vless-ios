@@ -1,0 +1,95 @@
+/* Hebrew (he) - RTL */
+"onboarding.welcome.title" = "ברוכים הבאים ל-FoxyWall";
+"onboarding.welcome.subtitle" = "חבר הפרטיות שלך.\nאבטח את החיבור בלחיצה אחת.";
+"onboarding.vpn.title" = "הגנת VPN";
+"onboarding.vpn.subtitle" = "התחבר לשרתים ברחבי העולם והצפן את כל תעבורת האינטרנט שלך באופן מיידי.";
+"onboarding.speed.title" = "בדיקת מהירות";
+"onboarding.speed.subtitle" = "מדוד הורדה, העלאה, פינג וג'יטר בלחיצה אחת.";
+"onboarding.tools.title" = "כלי רשת";
+"onboarding.tools.subtitle" = "עקוב אחר המסלול שהנתונים שלך עוברים באינטרנט ואבחן בעיות חיבור.";
+"onboarding.ready.title" = "מוכן להתחיל";
+"onboarding.ready.subtitle" = "בלי לוגים. בלי מעקב.\nהנתונים שלך נשארים שלך.";
+"onboarding.continue" = "המשך";
+"onboarding.legal" = "בהמשך, אתה מקבל את מדיניות הפרטיות ותנאי השימוש שלנו.";
+
+"general.done" = "סיום";
+"general.back" = "חזרה";
+"general.refresh" = "רענן";
+"general.connect" = "התחבר";
+"general.disconnect" = "התנתק";
+"general.connecting" = "מתחבר...";
+"general.encrypt" = "הצפן";
+"general.protected" = "מוגן";
+"general.not_protected" = "לא מוגן";
+"general.select_server" = "בחר שרת";
+"general.select_vpn_server" = "בחר שרת VPN";
+"general.no_servers" = "אין שרתים זמינים";
+"general.loading_servers" = "טוען שרתים...";
+"general.vless" = "VLESS";
+"general.auto_selected" = "נבחר אוטומטית";
+"general.servers_tab" = "שרתים";
+
+"vpn.tab_title" = "התחבר";
+"vpn.fox_guarding" = "השועל שומר עליך מ-%@";
+"vpn.connection_not_secure" = "החיבור שלך לא מאובטח";
+
+"speed.tab_title" = "מהירות";
+"speed.download_mbps" = "הורדה Mbps";
+"speed.upload_mbps" = "העלאה Mbps";
+"speed.ping" = "פינג";
+"speed.jitter" = "ג'יטר";
+"speed.ms" = "ms";
+"speed.vpn_active_note" = "VPN פעיל · התוצאות משקפות מהירות מוגנת";
+"speed.mbps" = "Mbps";
+"speed.mbps_download" = "Mbps הורדה";
+"speed.mbps_upload" = "Mbps העלאה";
+"speed.go" = "התחל";
+"speed.tap_to_measure" = "הקש למדידה";
+"speed.speed_test" = "בדיקת מהירות";
+
+"speed_phase.ready" = "מוכן";
+"speed_phase.testing_ping" = "בודק פינג...";
+"speed_phase.testing_download" = "בודק מהירות הורדה...";
+"speed_phase.testing_upload" = "בודק מהירות העלאה...";
+"speed_phase.complete" = "הושלם";
+
+"tools.tab_title" = "כלים";
+"tools.trace_to_server" = "עקוב לשרת ה-VPN הנוכחי";
+"tools.enter_ip_domain" = "הזן כתובת IP או דומיין למעקב המסלול";
+"tools.traceroute_title" = "מעקב מסלול";
+"tools.smart_route" = "מסלול חכם";
+"tools.enter_ip_short" = "הזן IP או דומיין למעקב";
+
+"protection.tab_title" = "הגנה";
+"protection.vpn_protection" = "הגנת VPN";
+"protection.connected" = "מחובר";
+"protection.disconnected" = "מנותק";
+"protection.connect_vpn" = "התחבר ל-VPN";
+"protection.disconnect_vpn" = "התנתק מ-VPN";
+
+"settings.tab_title" = "הגדרות";
+"settings.subscriptions" = "מנויים";
+"settings.manage_subscription" = "נהל את מנוי הפרימיום שלך";
+"settings.redeem_code" = "פדה קוד מבצע";
+"settings.enter_promo" = "הזן קוד פרומו או מבצע";
+"settings.appearance" = "מראה";
+"settings.light" = "בהיר";
+"settings.dark" = "כהה";
+"settings.privacy_policy" = "מדיניות פרטיות";
+"settings.terms_of_use" = "תנאי שימוש";
+"settings.app_name" = "שם האפליקציה";
+"settings.app_name_value" = "FoxyWall";
+"settings.version" = "גרסה";
+"settings.version_value" = "2.11";
+"settings.local_ip" = "כתובת IP מקומית";
+"settings.device_info" = "מידע על המכשיר";
+"settings.eula_title" = "הסכם רישיון למשתמש קצה";
+"settings.language" = "שפה";
+"settings.profile" = "פרופיל";
+
+"status.connecting_format" = "מתחבר ל-%@...";
+"status.select_server_first" = "אנא בחר שרת תחילה";
+"status.server_credentials" = "פרטי השרת לא זמינים";
+"status.vpn_simulator" = "VPN לא זמין בסימולטור. נא לבדוק במכשיר אמיתי.";
+"status.failed_load_servers" = "טעינת השרתים נכשלה: %@";
+"status.loaded_servers_format" = "נטענו %d שרתי VPN";

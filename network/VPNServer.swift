@@ -28,9 +28,15 @@ struct VPNServer: Codable, Identifiable, Equatable {
     let openvpnClientKey: String?
     let openvpnPort: Int
     
-    // Optional fields
-    let location: String?
-    let loadStatusText: String?
+    // Optional VLESS
+    let vlessUrl: String?
+    let vlessUuid: String?
+    let vlessPublicKey: String?
+    let vlessPort: Int?
+    
+    // Optional translations: locale code -> display name (e.g. {"en": "Germany", "de": "Deutschland"})
+    let countryNames: [String: String]?
+    let cityName: [String: String]?
     
     // Custom coding keys to match Supabase snake_case
     enum CodingKeys: String, CodingKey {
@@ -54,13 +60,58 @@ struct VPNServer: Codable, Identifiable, Equatable {
         case openvpnClientCert = "openvpn_client_cert"
         case openvpnClientKey = "openvpn_client_key"
         case openvpnPort = "openvpn_port"
-        case location
-        case loadStatusText = "load_status_text"
+        case countryNames = "country_names"
+        case cityName = "city_name"
+        case vlessUrl = "vless_url"
+        case vlessUuid = "vless_uuid"
+        case vlessPublicKey = "vless_public_key"
+        case vlessPort = "vless_port"
+    }
+    
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(String.self, forKey: .id)
+        name = try c.decode(String.self, forKey: .name)
+        countryCode = try c.decode(String.self, forKey: .countryCode)
+        countryName = try c.decode(String.self, forKey: .countryName)
+        city = try c.decode(String.self, forKey: .city)
+        serverAddress = try c.decode(String.self, forKey: .serverAddress)
+        isPremium = try c.decode(Bool.self, forKey: .isPremium)
+        active = try c.decode(Bool.self, forKey: .active)
+        status = try c.decode(String.self, forKey: .status)
+        flag = try c.decode(String.self, forKey: .flag)
+        createdAt = try c.decode(String.self, forKey: .createdAt)
+        updatedAt = try c.decode(String.self, forKey: .updatedAt)
+        wireguardPublicKey = try c.decodeIfPresent(String.self, forKey: .wireguardPublicKey)
+        wireguardPort = try c.decode(Int.self, forKey: .wireguardPort)
+        openvpnUsername = try c.decodeIfPresent(String.self, forKey: .openvpnUsername)
+        openvpnPassword = try c.decodeIfPresent(String.self, forKey: .openvpnPassword)
+        openvpnCaCert = try c.decodeIfPresent(String.self, forKey: .openvpnCaCert)
+        openvpnClientCert = try c.decodeIfPresent(String.self, forKey: .openvpnClientCert)
+        openvpnClientKey = try c.decodeIfPresent(String.self, forKey: .openvpnClientKey)
+        openvpnPort = try c.decode(Int.self, forKey: .openvpnPort)
+        vlessUrl = try c.decodeIfPresent(String.self, forKey: .vlessUrl)
+        vlessUuid = try c.decodeIfPresent(String.self, forKey: .vlessUuid)
+        vlessPublicKey = try c.decodeIfPresent(String.self, forKey: .vlessPublicKey)
+        vlessPort = try c.decodeIfPresent(Int.self, forKey: .vlessPort)
+        cityName = try c.decodeIfPresent([String: String].self, forKey: .cityName)
+        countryNames = try c.decodeIfPresent([String: String].self, forKey: .countryNames)
     }
     
     // Display name for UI
     var displayName: String {
         return "\(flag) \(name) - \(city)"
+    }
+    
+    /// Localized "City, Country" from database city_name (combined per locale).
+    func localizedCityName(preferredLocale: String) -> String {
+        let code = preferredLocale.replacingOccurrences(of: "_", with: "-")
+        if let names = cityName, !names.isEmpty {
+            if let name = names[code] ?? names[code.components(separatedBy: "-").first ?? code] ?? names["en"], !name.isEmpty {
+                return name
+            }
+        }
+        return city
     }
     
     // Check if server is active and available
@@ -76,6 +127,30 @@ struct VPNServer: Codable, Identifiable, Equatable {
     // Check if server has WireGuard credentials
     var hasWireguardConfig: Bool {
         return wireguardPublicKey != nil
+    }
+    
+    // Check if server has VLESS config: either full vless_url or uuid + public_key
+    var hasVlessConfig: Bool {
+        if let url = vlessUrl, !url.trimmingCharacters(in: .whitespaces).isEmpty, url.lowercased().hasPrefix("vless://") {
+            return true
+        }
+        let uuidOk = vlessUuid.map { !$0.trimmingCharacters(in: .whitespaces).isEmpty } ?? false
+        let keyOk = vlessPublicKey.map { !$0.trimmingCharacters(in: .whitespaces).isEmpty } ?? false
+        return uuidOk && keyOk
+    }
+    
+    /// VLESS URL to use for connection: either vless_url or built from uuid + public_key + server_address + port
+    var resolvedVlessUrl: String? {
+        if let url = vlessUrl, !url.trimmingCharacters(in: .whitespaces).isEmpty, url.lowercased().hasPrefix("vless://") {
+            return url
+        }
+        guard let uuid = vlessUuid?.trimmingCharacters(in: .whitespaces), !uuid.isEmpty,
+              vlessPublicKey.map({ !$0.trimmingCharacters(in: .whitespaces).isEmpty }) ?? false,
+              !serverAddress.isEmpty else {
+            return nil
+        }
+        let port = vlessPort ?? 443
+        return "vless://\(uuid)@\(serverAddress):\(port)"
     }
 
     // Get server coordinates based on city/country for map visualization

@@ -41,11 +41,11 @@ class SpeedTestService: ObservableObject {
         
         var description: String {
             switch self {
-            case .idle: return "Ready"
-            case .testingPing: return "Testing Ping..."
-            case .testingDownload: return "Testing Download Speed..."
-            case .testingUpload: return "Testing Upload Speed..."
-            case .complete: return "Complete"
+            case .idle: return L10n.phaseReady
+            case .testingPing: return L10n.phaseTestingPing
+            case .testingDownload: return L10n.phaseTestingDownload
+            case .testingUpload: return L10n.phaseTestingUpload
+            case .complete: return L10n.phaseComplete
             }
         }
     }

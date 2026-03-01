@@ -1,0 +1,95 @@
+/* Turkish (tr) */
+"onboarding.welcome.title" = "FoxyWall'a Hoş Geldiniz";
+"onboarding.welcome.subtitle" = "Gizlilik dostunuz.\nBağlantınızı tek dokunuşla güvence altına alın.";
+"onboarding.vpn.title" = "VPN Koruması";
+"onboarding.vpn.subtitle" = "Dünya genelindeki sunuculara bağlanın ve tüm internet trafiğinizi anında şifreleyin.";
+"onboarding.speed.title" = "Hız Testi";
+"onboarding.speed.subtitle" = "İndirme, yükleme, ping ve jitter'ı tek dokunuşla ölçün.";
+"onboarding.tools.title" = "Ağ Araçları";
+"onboarding.tools.subtitle" = "Verilerinizin internet üzerinde izlediği yolu takip edin ve bağlantı sorunlarını teşhis edin.";
+"onboarding.ready.title" = "Başlamaya Hazır";
+"onboarding.ready.subtitle" = "Log yok. İzleme yok.\nVerileriniz sizin kalır.";
+"onboarding.continue" = "Devam";
+"onboarding.legal" = "Devam ederek Gizlilik Politikamızı ve Kullanım Koşullarımızı kabul etmiş olursunuz.";
+
+"general.done" = "Tamam";
+"general.back" = "Geri";
+"general.refresh" = "Yenile";
+"general.connect" = "Bağlan";
+"general.disconnect" = "Bağlantıyı Kes";
+"general.connecting" = "Bağlanıyor...";
+"general.encrypt" = "Şifrele";
+"general.protected" = "Korumalı";
+"general.not_protected" = "Korumasız";
+"general.select_server" = "Sunucu Seç";
+"general.select_vpn_server" = "VPN Sunucusu Seç";
+"general.no_servers" = "Sunucu yok";
+"general.loading_servers" = "Sunucular yükleniyor...";
+"general.vless" = "VLESS";
+"general.auto_selected" = "Otomatik seçildi";
+"general.servers_tab" = "Sunucular";
+
+"vpn.tab_title" = "Bağlan";
+"vpn.fox_guarding" = "Tilki sizi %@ konumundan koruyor";
+"vpn.connection_not_secure" = "Bağlantınız güvende değil";
+
+"speed.tab_title" = "Hız";
+"speed.download_mbps" = "İndirme Mbps";
+"speed.upload_mbps" = "Yükleme Mbps";
+"speed.ping" = "Ping";
+"speed.jitter" = "Jitter";
+"speed.ms" = "ms";
+"speed.vpn_active_note" = "VPN aktif · sonuçlar korumalı hızı yansıtır";
+"speed.mbps" = "Mbps";
+"speed.mbps_download" = "Mbps indirme";
+"speed.mbps_upload" = "Mbps yükleme";
+"speed.go" = "BAŞLAT";
+"speed.tap_to_measure" = "Ölçmek için dokunun";
+"speed.speed_test" = "Hız testi";
+
+"speed_phase.ready" = "Hazır";
+"speed_phase.testing_ping" = "Ping test ediliyor...";
+"speed_phase.testing_download" = "İndirme hızı test ediliyor...";
+"speed_phase.testing_upload" = "Yükleme hızı test ediliyor...";
+"speed_phase.complete" = "Tamamlandı";
+
+"tools.tab_title" = "Araçlar";
+"tools.trace_to_server" = "Mevcut VPN sunucusuna iz sür";
+"tools.enter_ip_domain" = "Rota izi için IP veya alan adı girin";
+"tools.traceroute_title" = "Rota izleme";
+"tools.smart_route" = "Akıllı rota";
+"tools.enter_ip_short" = "İzlemek için IP veya alan adı girin";
+
+"protection.tab_title" = "Koruma";
+"protection.vpn_protection" = "VPN Koruması";
+"protection.connected" = "Bağlı";
+"protection.disconnected" = "Bağlı Değil";
+"protection.connect_vpn" = "VPN Bağlan";
+"protection.disconnect_vpn" = "VPN Bağlantısını Kes";
+
+"settings.tab_title" = "Ayarlar";
+"settings.subscriptions" = "Abonelikler";
+"settings.manage_subscription" = "Premium aboneliğinizi yönetin";
+"settings.redeem_code" = "Teklif kodu kullan";
+"settings.enter_promo" = "Promosyon veya teklif kodu girin";
+"settings.appearance" = "Görünüm";
+"settings.light" = "Açık";
+"settings.dark" = "Koyu";
+"settings.privacy_policy" = "Gizlilik Politikası";
+"settings.terms_of_use" = "Kullanım Koşulları";
+"settings.app_name" = "Uygulama Adı";
+"settings.app_name_value" = "FoxyWall";
+"settings.version" = "Sürüm";
+"settings.version_value" = "2.11";
+"settings.local_ip" = "Yerel IP Adresi";
+"settings.device_info" = "Cihaz Bilgisi";
+"settings.eula_title" = "Son Kullanıcı Lisans Sözleşmesi";
+"settings.language" = "Dil";
+"settings.profile" = "Profil";
+
+"status.connecting_format" = "%@ sunucusuna bağlanıyor...";
+"status.select_server_first" = "Lütfen önce bir sunucu seçin";
+"status.server_credentials" = "Sunucu kimlik bilgileri mevcut değil";
+"status.vpn_simulator" = "Simülatörde VPN kullanılamaz. Lütfen gerçek cihazda test edin.";
+"status.failed_load_servers" = "Sunucular yüklenemedi: %@";
+"status.loaded_servers_format" = "%d VPN sunucusu yüklendi";

@@ -1,0 +1,95 @@
+/* Portuguese Brazil (pt-BR) */
+"onboarding.welcome.title" = "Bem-vindo ao FoxyWall";
+"onboarding.welcome.subtitle" = "Seu companheiro de privacidade.\nProteja sua conexão com um toque.";
+"onboarding.vpn.title" = "Proteção VPN";
+"onboarding.vpn.subtitle" = "Conecte-se a servidores no mundo todo e criptografe todo seu tráfego de internet na hora.";
+"onboarding.speed.title" = "Teste de velocidade";
+"onboarding.speed.subtitle" = "Meça download, upload, ping e jitter com um toque.";
+"onboarding.tools.title" = "Ferramentas de rede";
+"onboarding.tools.subtitle" = "Rastreie o caminho dos seus dados na internet e diagnostique problemas de conexão.";
+"onboarding.ready.title" = "Pronto para começar";
+"onboarding.ready.subtitle" = "Sem logs. Sem rastreio.\nSeus dados continuam seus.";
+"onboarding.continue" = "Continuar";
+"onboarding.legal" = "Ao continuar, você aceita nossa Política de Privacidade e Termos de Uso.";
+
+"general.done" = "Pronto";
+"general.back" = "Voltar";
+"general.refresh" = "Atualizar";
+"general.connect" = "Conectar";
+"general.disconnect" = "Desconectar";
+"general.connecting" = "Conectando...";
+"general.encrypt" = "Criptografar";
+"general.protected" = "Protegido";
+"general.not_protected" = "Não protegido";
+"general.select_server" = "Selecionar servidor";
+"general.select_vpn_server" = "Selecionar servidor VPN";
+"general.no_servers" = "Nenhum servidor disponível";
+"general.loading_servers" = "Carregando servidores...";
+"general.vless" = "VLESS";
+"general.auto_selected" = "Selecionado automaticamente";
+"general.servers_tab" = "Servidores";
+
+"vpn.tab_title" = "Conectar";
+"vpn.fox_guarding" = "A raposa está te protegendo de %@";
+"vpn.connection_not_secure" = "Sua conexão não está segura";
+
+"speed.tab_title" = "Velocidade";
+"speed.download_mbps" = "Download Mbps";
+"speed.upload_mbps" = "Upload Mbps";
+"speed.ping" = "Ping";
+"speed.jitter" = "Jitter";
+"speed.ms" = "ms";
+"speed.vpn_active_note" = "VPN ativo · resultados refletem velocidade protegida";
+"speed.mbps" = "Mbps";
+"speed.mbps_download" = "Mbps download";
+"speed.mbps_upload" = "Mbps upload";
+"speed.go" = "IR";
+"speed.tap_to_measure" = "Toque para medir";
+"speed.speed_test" = "Teste de velocidade";
+
+"speed_phase.ready" = "Pronto";
+"speed_phase.testing_ping" = "Testando ping...";
+"speed_phase.testing_download" = "Testando velocidade de download...";
+"speed_phase.testing_upload" = "Testando velocidade de upload...";
+"speed_phase.complete" = "Completo";
+
+"tools.tab_title" = "Ferramentas";
+"tools.trace_to_server" = "Rastrear até o servidor VPN atual";
+"tools.enter_ip_domain" = "Digite um IP ou domínio para rastrear o caminho";
+"tools.traceroute_title" = "Rastreamento de rota";
+"tools.smart_route" = "Rota inteligente";
+"tools.enter_ip_short" = "Digite IP ou domínio para rastrear";
+
+"protection.tab_title" = "Proteção";
+"protection.vpn_protection" = "Proteção VPN";
+"protection.connected" = "Conectado";
+"protection.disconnected" = "Desconectado";
+"protection.connect_vpn" = "Conectar VPN";
+"protection.disconnect_vpn" = "Desconectar VPN";
+
+"settings.tab_title" = "Configurações";
+"settings.subscriptions" = "Assinaturas";
+"settings.manage_subscription" = "Gerencie sua assinatura premium";
+"settings.redeem_code" = "Resgatar código de oferta";
+"settings.enter_promo" = "Digite um código promocional ou oferta";
+"settings.appearance" = "Aparência";
+"settings.light" = "Claro";
+"settings.dark" = "Escuro";
+"settings.privacy_policy" = "Política de Privacidade";
+"settings.terms_of_use" = "Termos de Uso";
+"settings.app_name" = "Nome do app";
+"settings.app_name_value" = "FoxyWall";
+"settings.version" = "Versão";
+"settings.version_value" = "2.11";
+"settings.local_ip" = "Endereço IP local";
+"settings.device_info" = "Info do dispositivo";
+"settings.eula_title" = "Acordo de Licença de Usuário Final";
+"settings.language" = "Idioma";
+"settings.profile" = "Perfil";
+
+"status.connecting_format" = "Conectando a %@...";
+"status.select_server_first" = "Por favor selecione um servidor primeiro";
+"status.server_credentials" = "Credenciais do servidor não disponíveis";
+"status.vpn_simulator" = "VPN não disponível no simulador. Teste em um dispositivo real.";
+"status.failed_load_servers" = "Falha ao carregar servidores: %@";
+"status.loaded_servers_format" = "Carregados %d servidores VPN";

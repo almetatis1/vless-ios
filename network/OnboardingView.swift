@@ -5,7 +5,7 @@ struct OnboardingView: View {
     @AppStorage("appTheme") private var appTheme: String = "dark"
     @State private var currentPage = 0
 
-    private let totalPages = 5
+    private let totalPages = 4
 
     var body: some View {
         ZStack {
@@ -17,34 +17,26 @@ struct OnboardingView: View {
                     onboardingPage(
                         icon: "pawprint.fill",
                         iconColor: .orange,
-                        title: "Welcome to FoxyWall",
-                        subtitle: "Your privacy companion.\nSecure your connection with one tap."
+                        title: L10n.onboardingWelcomeTitle,
+                        subtitle: L10n.onboardingWelcomeSubtitle
                     )
                     .tag(0)
 
                     onboardingPage(
                         icon: "shield.fill",
                         iconColor: .green,
-                        title: "VPN Protection",
-                        subtitle: "Connect to servers worldwide and encrypt all your internet traffic instantly."
+                        title: L10n.onboardingVpnTitle,
+                        subtitle: L10n.onboardingVpnSubtitle
                     )
                     .tag(1)
 
                     onboardingPage(
                         icon: "speedometer",
                         iconColor: .cyan,
-                        title: "Speed Test",
-                        subtitle: "Measure your download, upload, ping, and jitter with a single tap."
+                        title: L10n.onboardingSpeedTitle,
+                        subtitle: L10n.onboardingSpeedSubtitle
                     )
                     .tag(2)
-
-                    onboardingPage(
-                        icon: "point.topleft.down.to.point.bottomright.curvepath.fill",
-                        iconColor: .purple,
-                        title: "Network Tools",
-                        subtitle: "Trace the route your data takes across the internet and diagnose connection issues."
-                    )
-                    .tag(3)
 
                     VStack(spacing: 32) {
                         Spacer()
@@ -58,11 +50,11 @@ struct OnboardingView: View {
                                 .foregroundColor(.green)
                         }
 
-                        Text("Ready to Go")
+                        Text(L10n.onboardingReadyTitle)
                             .font(.largeTitle)
                             .fontWeight(.bold)
 
-                        Text("No logs. No tracking.\nYour data stays yours.")
+                        Text(L10n.onboardingReadySubtitle)
                             .font(.body)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
@@ -74,7 +66,7 @@ struct OnboardingView: View {
                             hasSeenOnboarding = true
                             UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
                         }) {
-                            Text("Continue")
+                            Text(L10n.onboardingContinue)
                                 .font(.headline)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 18)
@@ -84,14 +76,14 @@ struct OnboardingView: View {
                         }
                         .padding(.horizontal, 40)
 
-                        Text("By continuing, you accept our Privacy Policy and Terms of Use.")
+                        Text(L10n.onboardingLegal)
                             .font(.caption2)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 40)
                             .padding(.bottom, 50)
                     }
-                    .tag(4)
+                    .tag(3)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .always))
                 .indexViewStyle(.page(backgroundDisplayMode: .always))

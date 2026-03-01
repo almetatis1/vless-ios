@@ -1,0 +1,94 @@
+/* Russian (ru) */
+"onboarding.welcome.title" = "Добро пожаловать в FoxyWall";
+"onboarding.welcome.subtitle" = "Ваш спутник конфиденциальности.\nЗащитите соединение одним нажатием.";
+"onboarding.vpn.title" = "Защита VPN";
+"onboarding.vpn.subtitle" = "Подключайтесь к серверам по всему миру и шифруйте весь трафик мгновенно.";
+"onboarding.speed.title" = "Тест скорости";
+"onboarding.speed.subtitle" = "Измеряйте загрузку, выгрузку, пинг и джиттер одним нажатием.";
+"onboarding.tools.title" = "Сетевые инструменты";
+"onboarding.tools.subtitle" = "Отслеживайте путь ваших данных в интернете и диагностируйте проблемы соединения.";
+"onboarding.ready.title" = "Готово к работе";
+"onboarding.ready.subtitle" = "Без логов. Без отслеживания.\nВаши данные остаются вашими.";
+"onboarding.continue" = "Продолжить";
+"onboarding.legal" = "Продолжая, вы принимаете нашу Политику конфиденциальности и Условия использования.";
+
+"general.done" = "Готово";
+"general.back" = "Назад";
+"general.refresh" = "Обновить";
+"general.connect" = "Подключить";
+"general.disconnect" = "Отключить";
+"general.connecting" = "Подключение...";
+"general.encrypt" = "Шифровать";
+"general.protected" = "Защищено";
+"general.not_protected" = "Не защищено";
+"general.select_server" = "Выбрать сервер";
+"general.select_vpn_server" = "Выбрать VPN‑сервер";
+"general.no_servers" = "Нет доступных серверов";
+"general.loading_servers" = "Загрузка серверов...";
+"general.vless" = "VLESS";
+"general.auto_selected" = "Выбрано автоматически";
+"general.servers_tab" = "Серверы";
+
+"vpn.tab_title" = "Подключить";
+"vpn.fox_guarding" = "Лис защищает вас из %@";
+"vpn.connection_not_secure" = "Ваше соединение не защищено";
+
+"speed.tab_title" = "Скорость";
+"speed.download_mbps" = "Загрузка Мбит/с";
+"speed.upload_mbps" = "Выгрузка Мбит/с";
+"speed.ping" = "Пинг";
+"speed.jitter" = "Джиттер";
+"speed.ms" = "мс";
+"speed.vpn_active_note" = "VPN активен · результаты показывают защищённую скорость";
+"speed.mbps" = "Мбит/с";
+"speed.mbps_download" = "Мбит/с загрузка";
+"speed.mbps_upload" = "Мбит/с выгрузка";
+"speed.go" = "СТАРТ";
+"speed.tap_to_measure" = "Нажмите для измерения";
+"speed.speed_test" = "Тест скорости";
+
+"speed_phase.ready" = "Готов";
+"speed_phase.testing_ping" = "Проверка пинга...";
+"speed_phase.testing_download" = "Проверка скорости загрузки...";
+"speed_phase.testing_upload" = "Проверка скорости выгрузки...";
+"speed_phase.complete" = "Готово";
+
+"tools.tab_title" = "Инструменты";
+"tools.trace_to_server" = "Трассировка до текущего VPN‑сервера";
+"tools.enter_ip_domain" = "Введите IP или домен для трассировки маршрута";
+"tools.traceroute_title" = "Трассировка маршрута";
+"tools.enter_ip_short" = "Введите IP или домен для трассировки";
+
+"protection.tab_title" = "Защита";
+"protection.vpn_protection" = "Защита VPN";
+"protection.connected" = "Подключено";
+"protection.disconnected" = "Отключено";
+"protection.connect_vpn" = "Подключить VPN";
+"protection.disconnect_vpn" = "Отключить VPN";
+
+"settings.tab_title" = "Настройки";
+"settings.subscriptions" = "Подписки";
+"settings.manage_subscription" = "Управление премиум‑подпиской";
+"settings.redeem_code" = "Активировать код предложения";
+"settings.enter_promo" = "Введите промо- или код предложения";
+"settings.appearance" = "Оформление";
+"settings.light" = "Светлая";
+"settings.dark" = "Тёмная";
+"settings.privacy_policy" = "Политика конфиденциальности";
+"settings.terms_of_use" = "Условия использования";
+"settings.app_name" = "Название приложения";
+"settings.app_name_value" = "FoxyWall";
+"settings.version" = "Версия";
+"settings.version_value" = "2.11";
+"settings.local_ip" = "Локальный IP‑адрес";
+"settings.device_info" = "Сведения об устройстве";
+"settings.eula_title" = "Лицензионное соглашение с конечным пользователем";
+"settings.language" = "Язык";
+"settings.profile" = "Профиль";
+
+"status.connecting_format" = "Подключение к %@...";
+"status.select_server_first" = "Сначала выберите сервер";
+"status.server_credentials" = "Учётные данные сервера недоступны";
+"status.vpn_simulator" = "VPN недоступен в симуляторе. Проверьте на реальном устройстве.";
+"status.failed_load_servers" = "Не удалось загрузить серверы: %@";
+"status.loaded_servers_format" = "Загружено серверов VPN: %d";

@@ -1,0 +1,95 @@
+/* Indonesian (id) */
+"onboarding.welcome.title" = "Selamat datang di FoxyWall";
+"onboarding.welcome.subtitle" = "Pendamping privasi Anda.\nAmankan koneksi dengan sekali ketuk.";
+"onboarding.vpn.title" = "Perlindungan VPN";
+"onboarding.vpn.subtitle" = "Terhubung ke server di seluruh dunia dan enkripsi semua lalu lintas internet Anda secara instan.";
+"onboarding.speed.title" = "Tes kecepatan";
+"onboarding.speed.subtitle" = "Ukur unduh, unggah, ping, dan jitter dengan sekali ketuk.";
+"onboarding.tools.title" = "Alat jaringan";
+"onboarding.tools.subtitle" = "Lacak rute data Anda di internet dan diagnosis masalah koneksi.";
+"onboarding.ready.title" = "Siap digunakan";
+"onboarding.ready.subtitle" = "Tanpa log. Tanpa pelacakan.\nData Anda tetap milik Anda.";
+"onboarding.continue" = "Lanjutkan";
+"onboarding.legal" = "Dengan melanjutkan, Anda menerima Kebijakan Privasi dan Ketentuan Penggunaan kami.";
+
+"general.done" = "Selesai";
+"general.back" = "Kembali";
+"general.refresh" = "Muat ulang";
+"general.connect" = "Hubungkan";
+"general.disconnect" = "Putuskan";
+"general.connecting" = "Menghubungkan...";
+"general.encrypt" = "Enkripsi";
+"general.protected" = "Terlindungi";
+"general.not_protected" = "Tidak terlindungi";
+"general.select_server" = "Pilih server";
+"general.select_vpn_server" = "Pilih server VPN";
+"general.no_servers" = "Tidak ada server tersedia";
+"general.loading_servers" = "Memuat server...";
+"general.vless" = "VLESS";
+"general.auto_selected" = "Dipilih otomatis";
+"general.servers_tab" = "Server";
+
+"vpn.tab_title" = "Sambung";
+"vpn.fox_guarding" = "Rubah melindungi Anda dari %@";
+"vpn.connection_not_secure" = "Koneksi Anda tidak aman";
+
+"speed.tab_title" = "Kecepatan";
+"speed.download_mbps" = "Unduh Mbps";
+"speed.upload_mbps" = "Unggah Mbps";
+"speed.ping" = "Ping";
+"speed.jitter" = "Jitter";
+"speed.ms" = "ms";
+"speed.vpn_active_note" = "VPN aktif · hasil mencerminkan kecepatan terlindungi";
+"speed.mbps" = "Mbps";
+"speed.mbps_download" = "Mbps unduh";
+"speed.mbps_upload" = "Mbps unggah";
+"speed.go" = "MULAI";
+"speed.tap_to_measure" = "Ketuk untuk mengukur";
+"speed.speed_test" = "Tes kecepatan";
+
+"speed_phase.ready" = "Siap";
+"speed_phase.testing_ping" = "Menguji ping...";
+"speed_phase.testing_download" = "Menguji kecepatan unduh...";
+"speed_phase.testing_upload" = "Menguji kecepatan unggah...";
+"speed_phase.complete" = "Selesai";
+
+"tools.tab_title" = "Alat";
+"tools.trace_to_server" = "Lacak ke server VPN saat ini";
+"tools.enter_ip_domain" = "Masukkan IP atau domain untuk melacak rute";
+"tools.traceroute_title" = "Pelacakan rute";
+"tools.smart_route" = "Rute pintar";
+"tools.enter_ip_short" = "Masukkan IP atau domain untuk melacak";
+
+"protection.tab_title" = "Perlindungan";
+"protection.vpn_protection" = "Perlindungan VPN";
+"protection.connected" = "Terhubung";
+"protection.disconnected" = "Terputus";
+"protection.connect_vpn" = "Hubungkan VPN";
+"protection.disconnect_vpn" = "Putuskan VPN";
+
+"settings.tab_title" = "Pengaturan";
+"settings.subscriptions" = "Langganan";
+"settings.manage_subscription" = "Kelola langganan premium Anda";
+"settings.redeem_code" = "Tukar kode penawaran";
+"settings.enter_promo" = "Masukkan kode promo atau penawaran";
+"settings.appearance" = "Tampilan";
+"settings.light" = "Terang";
+"settings.dark" = "Gelap";
+"settings.privacy_policy" = "Kebijakan Privasi";
+"settings.terms_of_use" = "Ketentuan Penggunaan";
+"settings.app_name" = "Nama aplikasi";
+"settings.app_name_value" = "FoxyWall";
+"settings.version" = "Versi";
+"settings.version_value" = "2.11";
+"settings.local_ip" = "Alamat IP lokal";
+"settings.device_info" = "Info perangkat";
+"settings.eula_title" = "Perjanjian Lisensi Pengguna Akhir";
+"settings.language" = "Bahasa";
+"settings.profile" = "Profil";
+
+"status.connecting_format" = "Menghubungkan ke %@...";
+"status.select_server_first" = "Silakan pilih server terlebih dahulu";
+"status.server_credentials" = "Kredensial server tidak tersedia";
+"status.vpn_simulator" = "VPN tidak tersedia di simulator. Silakan uji di perangkat nyata.";
+"status.failed_load_servers" = "Gagal memuat server: %@";
+"status.loaded_servers_format" = "Dimuat %d server VPN";

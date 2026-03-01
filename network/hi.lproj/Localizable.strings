@@ -1,0 +1,95 @@
+/* Hindi (hi) */
+"onboarding.welcome.title" = "FoxyWall में आपका स्वागत है";
+"onboarding.welcome.subtitle" = "आपका निजता साथी।\nएक टैप से अपना कनेक्शन सुरक्षित करें।";
+"onboarding.vpn.title" = "VPN सुरक्षा";
+"onboarding.vpn.subtitle" = "दुनिया भर के सर्वर से कनेक्ट हों और अपना पूरा इंटरनेट ट्रैफ़िक तुरंत एन्क्रिप्ट करें।";
+"onboarding.speed.title" = "स्पीड टेस्ट";
+"onboarding.speed.subtitle" = "एक टैप से डाउनलोड, अपलोड, पिंग और जिटर मापें।";
+"onboarding.tools.title" = "नेटवर्क टूल्स";
+"onboarding.tools.subtitle" = "इंटरनेट पर अपने डेटा के रास्ते को ट्रैक करें और कनेक्शन समस्याओं का निदान करें।";
+"onboarding.ready.title" = "शुरू करने के लिए तैयार";
+"onboarding.ready.subtitle" = "कोई लॉग नहीं। कोई ट्रैकिंग नहीं।\nआपका डेटा आपका ही रहता है।";
+"onboarding.continue" = "जारी रखें";
+"onboarding.legal" = "जारी रखकर आप हमारी गोपनीयता नीति और उपयोग की शर्तें स्वीकार करते हैं।";
+
+"general.done" = "हो गया";
+"general.back" = "वापस";
+"general.refresh" = "रीफ़्रेश करें";
+"general.connect" = "कनेक्ट करें";
+"general.disconnect" = "डिस्कनेक्ट करें";
+"general.connecting" = "कनेक्ट हो रहा है...";
+"general.encrypt" = "एन्क्रिप्ट";
+"general.protected" = "सुरक्षित";
+"general.not_protected" = "सुरक्षित नहीं";
+"general.select_server" = "सर्वर चुनें";
+"general.select_vpn_server" = "VPN सर्वर चुनें";
+"general.no_servers" = "कोई सर्वर उपलब्ध नहीं";
+"general.loading_servers" = "सर्वर लोड हो रहे हैं...";
+"general.vless" = "VLESS";
+"general.auto_selected" = "स्वचालित चयन";
+"general.servers_tab" = "सर्वर";
+
+"vpn.tab_title" = "कनेक्ट";
+"vpn.fox_guarding" = "लोमड़ी %@ से आपकी रक्षा कर रही है";
+"vpn.connection_not_secure" = "आपका कनेक्शन सुरक्षित नहीं है";
+
+"speed.tab_title" = "स्पीड";
+"speed.download_mbps" = "डाउनलोड Mbps";
+"speed.upload_mbps" = "अपलोड Mbps";
+"speed.ping" = "पिंग";
+"speed.jitter" = "जिटर";
+"speed.ms" = "ms";
+"speed.vpn_active_note" = "VPN सक्रिय · परिणाम सुरक्षित स्पीड दिखाते हैं";
+"speed.mbps" = "Mbps";
+"speed.mbps_download" = "Mbps डाउनलोड";
+"speed.mbps_upload" = "Mbps अपलोड";
+"speed.go" = "शुरू";
+"speed.tap_to_measure" = "मापने के लिए टैप करें";
+"speed.speed_test" = "स्पीड टेस्ट";
+
+"speed_phase.ready" = "तैयार";
+"speed_phase.testing_ping" = "पिंग टेस्ट हो रहा है...";
+"speed_phase.testing_download" = "डाउनलोड स्पीड टेस्ट हो रहा है...";
+"speed_phase.testing_upload" = "अपलोड स्पीड टेस्ट हो रहा है...";
+"speed_phase.complete" = "पूर्ण";
+
+"tools.tab_title" = "टूल्स";
+"tools.trace_to_server" = "वर्तमान VPN सर्वर तक ट्रैक करें";
+"tools.enter_ip_domain" = "रूट ट्रैक करने के लिए IP या डोमेन दर्ज करें";
+"tools.traceroute_title" = "रूट ट्रैस";
+"tools.smart_route" = "स्मार्ट रूट";
+"tools.enter_ip_short" = "ट्रैक करने के लिए IP या डोमेन दर्ज करें";
+
+"protection.tab_title" = "सुरक्षा";
+"protection.vpn_protection" = "VPN सुरक्षा";
+"protection.connected" = "कनेक्टेड";
+"protection.disconnected" = "डिस्कनेक्टेड";
+"protection.connect_vpn" = "VPN कनेक्ट करें";
+"protection.disconnect_vpn" = "VPN डिस्कनेक्ट करें";
+
+"settings.tab_title" = "सेटिंग्स";
+"settings.subscriptions" = "सब्सक्रिप्शन";
+"settings.manage_subscription" = "अपना प्रीमियम सब्सक्रिप्शन प्रबंधित करें";
+"settings.redeem_code" = "ऑफर कोड रिडीम करें";
+"settings.enter_promo" = "प्रोमो या ऑफर कोड दर्ज करें";
+"settings.appearance" = "दिखावट";
+"settings.light" = "लाइट";
+"settings.dark" = "डार्क";
+"settings.privacy_policy" = "गोपनीयता नीति";
+"settings.terms_of_use" = "उपयोग की शर्तें";
+"settings.app_name" = "ऐप का नाम";
+"settings.app_name_value" = "FoxyWall";
+"settings.version" = "वर्जन";
+"settings.version_value" = "2.11";
+"settings.local_ip" = "लोकल IP एड्रेस";
+"settings.device_info" = "डिवाइस जानकारी";
+"settings.eula_title" = "अंतिम उपयोगकर्ता लाइसेंस समझौता";
+"settings.language" = "भाषा";
+"settings.profile" = "प्रोफ़ाइल";
+
+"status.connecting_format" = "%@ से कनेक्ट हो रहा है...";
+"status.select_server_first" = "कृपया पहले एक सर्वर चुनें";
+"status.server_credentials" = "सर्वर क्रेडेंशियल उपलब्ध नहीं";
+"status.vpn_simulator" = "सिम्युलेटर में VPN उपलब्ध नहीं। कृपया असली डिवाइस पर टेस्ट करें।";
+"status.failed_load_servers" = "सर्वर लोड करने में विफल: %@";
+"status.loaded_servers_format" = "%d VPN सर्वर लोड हुए";
