@@ -9,3 +9,64 @@ steps:
           git fetch origin main
           git checkout origin/main -- network.xcodeproj/
           echo "Project file has been reset to original state."
+          name: Build NetSpec (Clean Build)
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '15.2'
+
+      - name: Inject Icon
+        run: |
+          if [ -f "$PWD/AppIcon.png" ]; then
+            ASSETS_PATH=$(find . -name "Assets.xcassets" | head -n 1)
+            ICON_SET="$ASSETS_PATH/AppIcon.appiconset"
+            mkdir -p "$ICON_SET"
+            cp "$PWD/AppIcon.png" "$ICON_SET/icon.png"
+            printf '{"images":[{"idiom":"universal","platform":"ios","size":"1024x1024","filename":"icon.png"}],"info":{"version":1,"author":"xcode"}}' > "$ICON_SET/Contents.json"
+          fi
+
+      - name: Build App
+        run: |
+          # Собираем проект как он есть, меняя имя только на выходе
+          xcodebuild build -project network.xcodeproj -scheme vless-ios \
+            -configuration Release -sdk iphoneos \
+            -derivedDataPath $PWD/derived_data \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            AD_HOC_CODE_SIGNING_ALLOWED=YES \
+            PRODUCT_NAME="NetSpec" \
+            ASSETCATALOG_COMPILER_APPICON_NAME="AppIcon"
+
+      - name: Prepare IPA
+        run: |
+          mkdir -p build/Payload
+          
+          # Ищем скомпилированный .app (он теперь должен называться NetSpec.app)
+          APP_PATH=$(find derived_data -name "*.app" -type d | grep "Release-iphoneos" | head -n 1)
+          
+          echo "FOUND APP AT: $APP_PATH"
+          
+          if [ -z "$APP_PATH" ]; then
+            echo "Error: App not found! Checking build artifacts..."
+            find derived_data -name "*.app"
+            exit 1
+          fi
+          
+          cp -r "$APP_PATH" build/Payload/
+          cd build && zip -r NetSpec.ipa Payload
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: NetSpec-VLESS-IPA
+          path: build/NetSpec.ipa
