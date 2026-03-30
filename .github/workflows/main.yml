@@ -1,5 +1,4 @@
-
-name: Build NetSpec (Clean Build)
+name: Build NetSpec (Recovery Build)
 on: [push, workflow_dispatch]
 
 jobs:
@@ -8,14 +7,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Нужен полный доступ к истории для сброса
 
-      - name: Reset Damaged Project
+      - name: Fix Damaged Project
         run: |
-          git fetch origin main
-          git checkout origin/main -- network.xcodeproj/
-          echo "Project file has been reset to original state."
+          # Скачиваем чистый, неповрежденный файл проекта из оригинала
+          curl -L https://raw.githubusercontent.com/AAAxis/vless-ios/main/network.xcodeproj/project.pbxproj -o network.xcodeproj/project.pbxproj
+          echo "Original project file restored."
 
       - name: Set up Xcode
         uses: maxim-lobanov/setup-xcode@v1
@@ -34,7 +31,7 @@ jobs:
 
       - name: Build App
         run: |
-          # Собираем проект как он есть, меняя имя только на выходе
+          # PRODUCT_NAME="NetSpec" безопасно меняет имя приложения на лету
           xcodebuild build -project network.xcodeproj -scheme vless-ios \
             -configuration Release -sdk iphoneos \
             -derivedDataPath $PWD/derived_data \
@@ -48,23 +45,19 @@ jobs:
       - name: Prepare IPA
         run: |
           mkdir -p build/Payload
-          
-          # Ищем скомпилированный .app (он теперь должен называться NetSpec.app)
-          APP_PATH=$(find derived_data -name "*.app" -type d | grep "Release-iphoneos" | head -n 1)
-          
-          echo "FOUND APP AT: $APP_PATH"
+          APP_PATH=$(find derived_data -name "NetSpec.app" -type d | grep "Release-iphoneos" | head -n 1)
           
           if [ -z "$APP_PATH" ]; then
-            echo "Error: App not found! Checking build artifacts..."
-            find derived_data -name "*.app"
-            exit 1
+            # Если с PRODUCT_NAME что-то не так, ищем любой .app
+            APP_PATH=$(find derived_data -name "*.app" -type d | grep "Release-iphoneos" | head -n 1)
           fi
           
+          echo "FOUND APP AT: $APP_PATH"
           cp -r "$APP_PATH" build/Payload/
           cd build && zip -r NetSpec.ipa Payload
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: NetSpec-VLESS-IPA
+          name: NetSpec-Final-IPA
           path: build/NetSpec.ipa
