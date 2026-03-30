@@ -1,4 +1,14 @@
-steps:
+
+name: Build NetSpec (Clean Build)
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -9,15 +19,6 @@ steps:
           git fetch origin main
           git checkout origin/main -- network.xcodeproj/
           echo "Project file has been reset to original state."
-          name: Build NetSpec (Clean Build)
-on: [push, workflow_dispatch]
-
-jobs:
-  build:
-    runs-on: macos-14
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
 
       - name: Set up Xcode
         uses: maxim-lobanov/setup-xcode@v1
